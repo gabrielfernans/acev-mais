@@ -1,0 +1,16 @@
+<app-custom-loader *ngIf="isLoading"></app-custom-loader>
+<div class="ministry-form-container" *ngIf="!isLoading">
+  <div class="ministry-form-container-section illustration">
+    <img src="/assets/img/add.jpg" alt="Add wallpaper" />
+  </div>
+  <div class="ministry-form-container-section">
+    <app-ministry-form-page
+      [ministry]="ministry"
+      [isManageable]="isManageable"
+      [isManagement]="isManagement"
+      [isSubmitting]="isSubmitting"
+      (submit)="submit($event)"
+      (archiveMinistry)="openArchiveConfirm($event)"
+    ></app-ministry-form-page>
+  </div>
+</div>

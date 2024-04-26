@@ -1,0 +1,131 @@
+<div class="member-container">
+  <div class="member-container-sidebar">
+    <div class="member-container-sidebar-profile">
+      <ng-container *ngIf="member?.photoUrl; else userGenericPhoto">
+        <div class="member-container-sidebar-profile-photo">
+          <div
+            class="member-container-sidebar-profile-photo-content"
+            [ngStyle]="{ background: 'url(' + member.photoUrl + ')' }"
+          ></div>
+        </div>
+      </ng-container>
+
+      <div class="member-container-sidebar-tags">
+        <ng-container *ngFor="let tag of memberTags">
+          <app-custom-tag [backgroundColor]="tag.color" [value]="tag.title"></app-custom-tag>
+        </ng-container>
+      </div>
+      <div class="member-container-sidebar-actions" *ngIf="isManageable">
+        <button nz-button nzSize="large" nzType="primary" (click)="manageMember()">
+          <span nz-icon nzType="setting" nzTheme="outline"></span>
+          Gerenciar membro
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="member-container-content">
+    <ul nz-menu nzMode="horizontal">
+      <ng-container *ngFor="let menu of menus">
+        <li
+          nz-menu-item
+          [nzSelected]="activeMenu === menu.value"
+          (click)="onChangeMenu(menu.value)"
+        >
+          <span nz-icon [nzType]="menu.icon"></span>
+          {{ menu.title }}
+        </li>
+      </ng-container>
+    </ul>
+
+    <div class="member-container-content-dynamic">
+      <ng-container *ngIf="activeMenu === 'profile'">
+        <div class="member-container-content-dynamic-profile">
+          <h3>Informações pessoais</h3>
+
+          <ng-container *ngFor="let item of memberProfile">
+            <div class="member-container-content-dynamic-profile-item">
+              <label for="name">{{ item.label }}:</label>
+              <span name="name">{{ item.value }}</span>
+            </div>
+          </ng-container>
+
+          <h3>Informações de contato</h3>
+
+          <ng-container *ngFor="let item of memberContact">
+            <div class="member-container-content-dynamic-profile-item">
+              <label for="name">{{ item.label }}:</label>
+              <span name="name">{{ item.value }}</span>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="activeMenu === 'address'">
+        <h3>Endereço</h3>
+
+        <div class="member-container-content-dynamic-address">
+          <ng-container *ngIf="member?.address; else noAddress">
+            <p [innerHTML]="addressView"></p>
+          </ng-container>
+          <ng-container *ngIf="!isLoadingAddress && coordinates.results.length > 0">
+            <app-custom-location [coordinates]="coordinates"></app-custom-location>
+          </ng-container>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="activeMenu === 'ministries'">
+        <h3>Ministérios</h3>
+
+        <ng-container *ngIf="member.ministries.length > 0; else noMinistry">
+          <p>Este membro participa dos ministérios abaixo</p>
+
+          <div class="member-container-content-dynamic-ministry">
+            <a
+              *ngFor="let ministry of member.ministries"
+              class="member-container-content-dynamic-ministry-item"
+              [routerLink]="['/ministries', ministry.id]"
+              >{{ ministry.name }} <span nz-icon nzType="export" nzTheme="outline"></span
+            ></a>
+          </div>
+        </ng-container>
+      </ng-container>
+      <ng-container *ngIf="activeMenu === 'agrupe'">
+        <h3>Agrupe</h3>
+
+        <ng-container *ngIf="member.idAgrupe; else noAgrupe">
+          <p>Este membro participa do agrupe abaixo:</p>
+
+          <div class="member-container-content-dynamic-agrupe">
+            <a
+              class="member-container-content-dynamic-agrupe-item"
+              [routerLink]="['/agrupes', member.idAgrupe]"
+              >{{ member.agrupeName }} <span nz-icon nzType="export" nzTheme="outline"></span
+            ></a>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<ng-template #userGenericPhoto>
+  <div class="member-container-sidebar-profile-photo">
+    <div class="member-container-sidebar-profile-photo-content generic"></div>
+  </div>
+</ng-template>
+
+<ng-template #noAddress>
+  <div class="member-container-empty">
+    <nz-empty [nzNotFoundContent]="'Este membro não possui um endereço cadastrado.'"></nz-empty>
+  </div>
+</ng-template>
+
+<ng-template #noMinistry>
+  <div class="member-container-empty">
+    <nz-empty [nzNotFoundContent]="'Este membro não participa de nenhum ministério.'"></nz-empty>
+  </div>
+</ng-template>
+
+<ng-template #noAgrupe>
+  <div class="member-container-empty">
+    <nz-empty [nzNotFoundContent]="'Este membro não participa de nenhum agrupe.'"></nz-empty>
+  </div>
+</ng-template>

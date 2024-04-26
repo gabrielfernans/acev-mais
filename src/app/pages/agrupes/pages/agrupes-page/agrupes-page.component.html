@@ -1,0 +1,69 @@
+<div class="agrupes-container">
+  <div class="agrupes-container-content">
+    <ng-container *ngFor="let agrupe of agrupes; let i = index">
+      <div
+        class="agrupes-container-content-card"
+        [routerLink]="['/agrupes', agrupe.id]"
+        [ngStyle]="{
+          'background-color': !agrupe.photoUrl
+            ? agrupesMetadata[i].backgroundColor
+            : 'var(--custom-background-secondary-color)',
+          'background-image': !agrupe.photoUrl
+            ? agrupesMetadata[i].backgroundImage
+            : 'var(--custom-background-secondary-color)'
+        }"
+      >
+        <app-custom-tag
+          class="agrupes-container-content-card-tag"
+          [value]="agrupesMetadata[i].tagName"
+        ></app-custom-tag>
+
+        <div
+          class="agrupes-container-content-card-bg"
+          [ngStyle]="{
+            background: 'url(' + agrupe.photoUrl + ')'
+          }"
+        ></div>
+
+        <nz-avatar-group class="agrupes-container-content-card-avatars">
+          <ng-container *ngFor="let frequenter of agrupe.frequenters.slice(0, 3); let i = index">
+            <nz-avatar
+              style="background-color: var(--custom-primary-teal)"
+              [nzSrc]="frequenter.photoUrl"
+              [nzText]="getAvatarText(frequenter, agrupe)"
+            ></nz-avatar>
+          </ng-container>
+        </nz-avatar-group>
+
+        <div class="agrupes-container-content-card-data">
+          <h3>{{ agrupe.name }}</h3>
+          <ng-container *ngFor="let leader of agrupe.leaders">
+            <span>{{ leader.name.split(' ')[0] }}</span>
+          </ng-container>
+        </div>
+        <button
+          class="agrupes-container-content-card-button"
+          nz-button
+          nzType="default"
+          nzShape="circle"
+        >
+          <span nz-icon nzType="right"></span>
+        </button>
+      </div>
+      <ng-template #coverTemplate> </ng-template>
+    </ng-container>
+  </div>
+</div>
+
+<ng-template #inputClearTpl>
+  <span
+    nz-icon
+    class="ant-input-clear-icon"
+    nzTheme="fill"
+    nzType="close-circle"
+    *ngIf="searchValue"
+    (click)="searchValue = null"
+  ></span>
+</ng-template>
+
+<ng-template #prefixTemplateSearch><span nz-icon nzType="search"></span></ng-template>

@@ -1,0 +1,145 @@
+<div class="agrupe-meetings-container">
+  <div class="agrupe-meetings-container-pagination">
+    <nz-pagination
+      [nzPageIndex]="pageIndex"
+      [nzTotal]="pageTotal"
+      [nzPageSize]="pageSize"
+      (nzPageIndexChange)="onChangeParams()"
+      (nzPageSizeChange)="onChangeParams()"
+    ></nz-pagination>
+  </div>
+
+  <div class="agrupe-meetings-container-content">
+    <nz-list nzItemLayout="vertical">
+      <ng-container *ngFor="let agrupeMeeting of agrupeMeetings; let i = index">
+        <nz-list-item class="agrupe-meetings-container-content-item">
+          <nz-list-item-meta>
+            <nz-list-item-meta-avatar
+              style="cursor: pointer"
+              [nzSrc]="agrupeMeeting.agrupe.photoUrl"
+              (click)="redirectToAgrupe(agrupeMeeting.agrupe)"
+            ></nz-list-item-meta-avatar>
+            <nz-list-item-meta-title
+              style="cursor: pointer"
+              (click)="redirectToAgrupe(agrupeMeeting.agrupe)"
+            >
+              {{ agrupeMeeting.agrupe.name }}
+            </nz-list-item-meta-title>
+            <nz-list-item-meta-description>
+              {{ agrupeMeeting.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+            </nz-list-item-meta-description>
+          </nz-list-item-meta>
+          <div class="agrupe-meetings-container-content-item-data">
+            <span>
+              <span nz-icon nzType="calendar" nzTheme="outline"></span>
+              Realizado dia {{ agrupeMeeting?.date | date: 'dd/MM/yyyy' }}
+            </span>
+            <ng-container *ngIf="!agrupeMeeting.customLesson; else customLesson">
+              <span>
+                <span nz-icon nzType="book" nzTheme="outline"></span>
+                Série: {{ agrupeMeeting.lesson?.seriesName || '-' }} |
+                {{ agrupeMeeting.lesson?.title || '-' }}
+              </span>
+            </ng-container>
+            <ng-template #customLesson>
+              <span>
+                <span nz-icon nzType="book" nzTheme="outline"></span>
+                Estudo avulso: {{ agrupeMeeting.customLessonTitle || '-' }}
+              </span>
+            </ng-template>
+            <div class="agrupe-meetings-container-content-item-data-actions">
+              <button nz-button [nzType]="'default'" (click)="openParticipantsModal(agrupeMeeting)">
+                <span>Ver participantes</span>
+              </button>
+              <button
+                *ngIf="canManage(agrupeMeeting)"
+                nz-button
+                [nzType]="'default'"
+                (click)="editMeeting(agrupeMeeting)"
+              >
+                <span> <span nz-icon nzType="edit" nzTheme="outline"></span>Gerenciar</span>
+              </button>
+            </div>
+          </div>
+
+          <ul nz-list-item-actions>
+            <nz-list-item-action>
+              <span nz-icon nzType="team" nzTheme="outline"> </span>
+              Membros
+              <span style="margin-left: 6px"> {{ agrupeMeeting?.participants?.length }} </span>
+            </nz-list-item-action>
+            <nz-list-item-action>
+              <span style="cursor: pointer" nz-icon nzType="usergroup-add" nzTheme="outline">
+              </span>
+              Convidados
+              <span style="margin-left: 6px"> {{ agrupeMeeting?.guests?.length || '-' }} </span>
+            </nz-list-item-action>
+          </ul>
+
+          <nz-list-item-extra>
+            <div
+              class="agrupe-meetings-container-content-item-image"
+              [ngClass]="{ 'no-photo': !agrupeMeeting.photoUrl }"
+              (click)="openFile(agrupeMeeting.photoUrl)"
+            >
+              <div
+                class="agrupe-meetings-container-content-item-image-content"
+                [ngStyle]="{
+                  background: agrupeMeeting.photoUrl ? 'url(' + agrupeMeeting.photoUrl + ')' : ''
+                }"
+              ></div>
+            </div>
+          </nz-list-item-extra>
+        </nz-list-item>
+      </ng-container>
+    </nz-list>
+
+    <div class="agrupe-meetings-container-content"></div>
+  </div>
+</div>
+
+<nz-modal
+  nzTitle="Participantes"
+  [nzFooter]="null"
+  [(nzVisible)]="showParticipantsModal"
+  (nzOnCancel)="showParticipantsModal = false"
+>
+  <ng-container *nzModalContent>
+    <h3>Membros</h3>
+
+    <div class="agrupe-meetings-container-content-modal">
+      <div
+        class="agrupe-meetings-container-content-modal-item"
+        *ngFor="let participant of activeAgrupeMeeting.participants"
+      >
+        <ng-container *ngIf="participant.photoUrl; else noPic">
+          <nz-avatar
+            [nzSize]="28"
+            [nzSrc]="participant.photoUrl"
+            style="background-color: var(--custom-background-secondary-color)"
+          ></nz-avatar>
+        </ng-container>
+        <ng-template #noPic>
+          <nz-avatar
+            [nzSize]="28"
+            [ngStyle]="{
+              color: 'var(--custom-primary-teal)',
+              backgroundColor: 'var(--custom-background-secondary-color)'
+            }"
+            [nzIcon]="'user'"
+          ></nz-avatar>
+        </ng-template>
+
+        <a [routerLink]="['/members', participant.id]">{{ participant.name }}</a>
+      </div>
+    </div>
+
+    <ng-container *ngIf="activeAgrupeMeeting?.guests && activeAgrupeMeeting.guests.length > 0">
+      <h3>Convidados</h3>
+
+      <ng-container *ngFor="let guest of activeAgrupeMeeting.guests">
+        <p>{{ guest }}</p>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+</nz-modal>

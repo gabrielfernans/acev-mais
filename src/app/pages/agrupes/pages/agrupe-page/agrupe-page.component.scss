@@ -1,0 +1,143 @@
+.agrupe-container {
+  display: grid;
+  grid-template-columns: 340px auto;
+  gap: 1rem;
+  height: 100%;
+
+  &-side {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    &-profile {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      gap: 0.25rem;
+      width: 100%;
+
+      &-photo {
+        width: 100%;
+        // border: 1px solid var(--custom-secondary-border);
+        background-color: var(--custom-background-primary-color);
+        border-radius: 0.75rem;
+        overflow: hidden;
+
+        &-content {
+          height: 100%;
+          width: 100%;
+          aspect-ratio: 4/3;
+          background-size: cover !important;
+          background-repeat: no-repeat !important;
+          background-position: center !important;
+
+          &.generic {
+            background-size: 60% !important;
+            background: url('/assets/img/home.png');
+            opacity: 0.4;
+            padding: 1rem;
+          }
+        }
+      }
+    }
+
+    &-actions {
+      button {
+        width: 100%;
+      }
+    }
+
+    &-data {
+      display: grid;
+      gap: 1rem;
+
+      &-leadership {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        &-avatars {
+          margin-bottom: 0.5rem;
+        }
+
+        label {
+          color: var(--custom-primary-color-text);
+          font-size: 1rem;
+        }
+
+        p {
+          font-size: 0.75rem;
+          font-weight: 500;
+          margin: 0;
+        }
+      }
+
+      &-tags {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+    }
+  }
+
+  &-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+
+    &-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    &-dynamic {
+      display: grid;
+      padding: 0 1rem 1rem;
+      gap: 1rem;
+
+      .actions-container {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+      }
+
+      &-address {
+        p {
+          font-size: 0.75rem;
+          color: var(--custom-primary-gray);
+        }
+      }
+
+      &-table {
+        tbody {
+          td:first-child {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+          }
+
+          button {
+            margin: 0 auto;
+            height: 1.5rem;
+            width: 1.5rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+nz-select {
+  width: 100%;
+}
+
+label {
+  display: block;
+  font-weight: 300;
+  padding-top: 1rem;
+  color: var(--custom-primary-gray);
+}

@@ -1,0 +1,240 @@
+<div class="members-container">
+  <header class="members-container-header">
+    <div class="search-container">
+      <nz-input-group [nzSuffix]="inputClearTpl" [nzPrefix]="prefixTemplateSearch">
+        <input
+          type="text"
+          nz-input
+          [(ngModel)]="searchValue"
+          (input)="onSearchMembers()"
+          placeholder="Buscar um membro por nome ou e-mail"
+        />
+      </nz-input-group>
+    </div>
+
+    <div class="actions-container">
+      <!-- <nz-radio-group [(ngModel)]="tableListingType">
+        <label nz-radio-button nzValue="list" ngDefaultControl>
+          <span nz-icon nzType="menu" nzTheme="outline"></span>
+        </label>
+        <label nz-radio-button nzValue="cards">
+          <span nz-icon nzType="appstore" nzTheme="outline"></span>
+        </label>
+      </nz-radio-group> -->
+
+      <button nz-button nzType="default" (click)="showFilterModal = true">
+        <span nz-icon nzType="filter"></span>
+        Filtrar
+      </button>
+
+      <button nz-button nzType="primary" (click)="addMember()" *ngIf="isManageable">
+        Adicionar
+      </button>
+    </div>
+  </header>
+
+  <div class="members-container-content">
+    <nz-table
+      #smallTable
+      nzShowSizeChanger
+      [nzFrontPagination]="false"
+      [nzShowPagination]="true"
+      [nzData]="members"
+      [nzLoading]="isLoading"
+      [nzPageSize]="pageSize"
+      [nzPageIndex]="pageIndex"
+      [nzTotal]="pageTotal"
+      (nzQueryParams)="onQueryParamsChange($event)"
+    >
+      <thead>
+        <tr>
+          <th nzColumnKey="name" [nzSortFn]="true">Nome</th>
+          <th nzColumnKey="agrupe">Agrupe</th>
+          <th nzColumnKey="ministries">Ministérios</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let member of members">
+          <td class="members-container-content-image">
+            <ng-container *ngIf="member.photoUrl; else noPic">
+              <nz-avatar
+                [nzSize]="36"
+                [nzSrc]="member.photoUrl"
+                style="background-color: var(--custom-background-secondary-color)"
+              ></nz-avatar>
+            </ng-container>
+            <ng-template #noPic>
+              <nz-avatar
+                [nzSize]="36"
+                [ngStyle]="{
+                  color: 'var(--custom-primary-teal)',
+                  backgroundColor: 'var(--custom-background-secondary-color)'
+                }"
+                [nzIcon]="'user'"
+              ></nz-avatar>
+            </ng-template>
+
+            <a [routerLink]="['/members', member.id]">{{ member.name }}</a>
+
+            <app-custom-tag
+              [color]="'var(--custom-primary-white)'"
+              [backgroundColor]="
+                member.memberType === 'MEMBER'
+                  ? 'var(--custom-primary-teal)'
+                  : 'var(--custom-primary-orange)'
+              "
+              [value]="member.memberType === 'MEMBER' ? 'Membro' : 'Congregado'"
+            ></app-custom-tag>
+
+            <ng-container *ngIf="member.isAgrupeLeader">
+              <app-custom-tag
+                [color]="'var(--custom-primary-white)'"
+                [backgroundColor]="'var(--custom-primary-purple)'"
+                [value]="'Líder de agrupe'"
+              >
+              </app-custom-tag>
+            </ng-container>
+
+            <ng-container *ngIf="member.isAgrupeApprentice">
+              <app-custom-tag
+                [color]="'var(--custom-primary-purple)'"
+                [backgroundColor]="'var(--custom-secondary-purple)'"
+                [value]="'Aprendiz de agrupe'"
+              >
+              </app-custom-tag>
+            </ng-container>
+
+            <ng-container *ngIf="member.isArchived">
+              <app-custom-tag
+                [color]="'var(--custom-primary-white)'"
+                [backgroundColor]="'var(--custom-secondary-color-text)'"
+                [value]="'Arquivado'"
+              >
+              </app-custom-tag>
+            </ng-container>
+          </td>
+          <td>
+            <div class="members-container-content-agrupe">
+              <ng-container *ngIf="member.agrupeName; else withoutAgrupe">
+                <a [routerLink]="['/agrupes', member.idAgrupe]">
+                  {{ member.agrupeName }}
+                </a>
+              </ng-container>
+              <ng-template #withoutAgrupe>
+                <app-custom-tag
+                  [color]="'var(--custom-primary-white)'"
+                  [backgroundColor]="'var(--custom-primary-color-text)'"
+                  [value]="'Sem agrupe'"
+                ></app-custom-tag>
+              </ng-template>
+            </div>
+          </td>
+          <td>
+            <div class="members-container-content-ministry">
+              <ng-container *ngIf="member.ministries.length > 0; else withoutMinistry">
+                <ng-container *ngFor="let ministry of member.ministries">
+                  <a [routerLink]="['/ministries', ministry.id]">
+                    {{ ministry.name }}
+                  </a>
+                </ng-container>
+              </ng-container>
+              <ng-template #withoutMinistry>
+                <app-custom-tag
+                  [color]="'var(--custom-primary-white)'"
+                  [backgroundColor]="'var(--custom-primary-color-text)'"
+                  [value]="'Sem ministério'"
+                ></app-custom-tag>
+              </ng-template>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</div>
+
+<ng-template #inputClearTpl>
+  <span
+    nz-icon
+    class="ant-input-clear-icon"
+    nzTheme="fill"
+    nzType="close-circle"
+    *ngIf="searchValue"
+    (click)="searchValue = ''; onSearchMembers()"
+  ></span>
+</ng-template>
+
+<ng-template #prefixTemplateSearch><span nz-icon nzType="search"></span></ng-template>
+
+<nz-modal
+  nzCentered
+  nzTitle="Filtros"
+  nzOkText="Confirmar"
+  nzCancelText="Cancelar"
+  [(nzVisible)]="showFilterModal"
+  [nzFooter]="modalFooter"
+  (nzOnCancel)="showFilterModal = false"
+>
+  <ng-container *nzModalContent>
+    <form [formGroup]="filterForm" class="members-container-filter">
+      <div class="members-container-filter-item">
+        <h3>Tipo</h3>
+        <nz-radio-group formControlName="memberType" nzSize="large">
+          <label nz-radio nzValue="MEMBER">Membro</label>
+          <label nz-radio nzValue="CONGREGANT">Congregado</label>
+        </nz-radio-group>
+      </div>
+
+      <div class="members-container-filter-item">
+        <h3>Forma de ingresso</h3>
+        <nz-radio-group
+          formControlName="entryCategory"
+          nzSize="large"
+          [nzDisabled]="memberType.value === 'CONGREGANT'"
+        >
+          <label nz-radio nzValue="BAPTISM">Batismo</label>
+          <label nz-radio nzValue="ACCLAIM">Aclamação</label>
+          <label nz-radio nzValue="TRANSFER">Transferência</label>
+        </nz-radio-group>
+      </div>
+
+      <div class="members-container-filter-item">
+        <h3>Gênero</h3>
+        <nz-radio-group formControlName="gender" nzSize="large">
+          <label nz-radio nzValue="M">Masculino</label>
+          <label nz-radio nzValue="F">Feminino</label>
+        </nz-radio-group>
+      </div>
+
+      <div class="members-container-filter-item">
+        <h3>Estado civil</h3>
+        <nz-radio-group formControlName="maritalStatus" nzSize="large">
+          <label nz-radio nzValue="S">Solteiro(a)</label>
+          <label nz-radio nzValue="C">Casado(a)</label>
+          <label nz-radio nzValue="V">Viúvo(a)</label>
+          <label nz-radio nzValue="D">Divorciado(a)</label>
+        </nz-radio-group>
+      </div>
+
+      <div class="members-container-filter-item">
+        <h3>Membro arquivado</h3>
+        <nz-switch formControlName="archived"></nz-switch>
+      </div>
+    </form>
+  </ng-container>
+
+  <ng-template #modalFooter>
+    <div class="members-container-filter-footer">
+      <button
+        class="members-container-filter-clear"
+        nz-button
+        nzType="default"
+        (click)="clearFilters()"
+      >
+        Limpar
+      </button>
+      <button nz-button nzType="default" (click)="showFilterModal = false">Cancelar</button>
+      <button nz-button nzType="primary" (click)="onSetFilter()">Confirmar</button>
+    </div>
+  </ng-template>
+</nz-modal>

@@ -1,0 +1,52 @@
+<div class="series-container">
+  <div class="series-container-content">
+    <ng-container *ngFor="let serie of series; let i = index">
+      <div
+        class="series-container-content-card"
+        [routerLink]="['/series', serie.id]"
+        [ngStyle]="{
+          'background-color': !serie.photoUrl
+            ? seriesMetadata[i].backgroundColor
+            : 'var(--custom-background-secondary-color)',
+          'background-image': !serie.photoUrl
+            ? seriesMetadata[i].backgroundImage
+            : 'var(--custom-background-secondary-color)'
+        }"
+      >
+        <div
+          class="series-container-content-card-bg"
+          [ngStyle]="{
+            background: 'url(' + serie.photoUrl + ')'
+          }"
+        ></div>
+
+        <div class="series-container-content-card-data">
+          <h3>{{ serie.title }}</h3>
+          <span>{{ serie.period || '-' }}</span>
+        </div>
+        <button
+          class="series-container-content-card-button"
+          nz-button
+          nzType="default"
+          nzShape="circle"
+        >
+          <span nz-icon nzType="right"></span>
+        </button>
+      </div>
+      <ng-template #coverTemplate> </ng-template>
+    </ng-container>
+  </div>
+</div>
+
+<ng-template #inputClearTpl>
+  <span
+    nz-icon
+    class="ant-input-clear-icon"
+    nzTheme="fill"
+    nzType="close-circle"
+    *ngIf="searchValue"
+    (click)="searchValue = null"
+  ></span>
+</ng-template>
+
+<ng-template #prefixTemplateSearch><span nz-icon nzType="search"></span></ng-template>

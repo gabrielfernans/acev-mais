@@ -1,0 +1,38 @@
+<ng-container *ngIf="!isLoading; else loader">
+  <div class="actions-container">
+    <nz-select
+      [(ngModel)]="selectedAgrupe"
+      nzPlaceHolder="Filtre pelo agrupe"
+      (ngModelChange)="onChangeFilter()"
+    >
+      <nz-option [nzValue]="null" [nzLabel]="'Todos os agrupes'"></nz-option>
+      <ng-container *ngFor="let item of agrupes">
+        <nz-option [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+      </ng-container>
+    </nz-select>
+    <button nz-button nzType="primary" [routerLink]="['/agrupe-meetings', 'add']">Adicionar</button>
+  </div>
+  <ng-container *ngIf="!serverError && agrupeMeetings.length !== 0; else feedback">
+    <app-agrupe-meetings-page
+      [loggedUser]="loggedUser"
+      [pageTotal]="pageTotal"
+      [pageIndex]="pageIndex"
+      [agrupeMeetings]="agrupeMeetings"
+      (getAgrupeMeetings)="getAgrupeMeetings($event)"
+    ></app-agrupe-meetings-page>
+  </ng-container>
+</ng-container>
+
+<ng-template #feedback>
+  <ng-container *ngIf="serverFeedback">
+    <app-custom-feedback
+      [type]="serverFeedback.status"
+      [title]="serverFeedback.title"
+      [subTitle]="serverFeedback.subtitle"
+    ></app-custom-feedback>
+  </ng-container>
+</ng-template>
+
+<ng-template #loader>
+  <app-custom-loader></app-custom-loader>
+</ng-template>

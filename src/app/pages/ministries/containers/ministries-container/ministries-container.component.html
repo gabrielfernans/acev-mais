@@ -1,0 +1,24 @@
+<ng-container *ngIf="!isLoading; else loader">
+  <div class="actions-container">
+    <button nz-button nzType="primary" [routerLink]="['/ministries', 'add']" *ngIf="isManageable">
+      Adicionar
+    </button>
+  </div>
+  <ng-container *ngIf="!serverError && ministries.length !== 0; else feedback">
+    <app-ministries-page [ministries]="ministries"></app-ministries-page>
+  </ng-container>
+</ng-container>
+
+<ng-template #feedback>
+  <ng-container *ngIf="serverFeedback">
+    <app-custom-feedback
+      [type]="serverFeedback.status"
+      [title]="serverFeedback.title"
+      [subTitle]="serverFeedback.subtitle"
+    ></app-custom-feedback>
+  </ng-container>
+</ng-template>
+
+<ng-template #loader>
+  <app-custom-loader></app-custom-loader>
+</ng-template>

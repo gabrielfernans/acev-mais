@@ -1,0 +1,16 @@
+<app-custom-loader *ngIf="isLoading"></app-custom-loader>
+<div class="agrupe-form-container" *ngIf="!isLoading">
+  <div class="agrupe-form-container-section illustration">
+    <img src="/assets/img/add.jpg" alt="Add wallpaper" />
+  </div>
+  <div class="agrupe-form-container-section">
+    <app-agrupe-form-page
+      [agrupe]="agrupe"
+      [isManageable]="isManageable"
+      [isManagement]="isManagement"
+      [isSubmitting]="isSubmitting"
+      (submit)="submit($event)"
+      (archiveAgrupe)="openArchiveConfirm($event)"
+    ></app-agrupe-form-page>
+  </div>
+</div>

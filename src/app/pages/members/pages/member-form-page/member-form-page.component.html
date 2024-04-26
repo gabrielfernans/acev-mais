@@ -1,0 +1,295 @@
+<div class="member-container-form">
+  <nz-steps [nzCurrent]="current" nzSize="small">
+    <nz-step nzTitle="Dados básicos"> </nz-step>
+    <nz-step nzTitle="informações"> </nz-step>
+    <nz-step nzTitle="Endereço"> </nz-step>
+    <nz-step nzTitle="Imagem"> </nz-step>
+  </nz-steps>
+
+  <!-- INFO BÁSICA: CURRENT = 0 -->
+  <ng-container *ngIf="current === 0">
+    <span class="member-container-form-guide">Insira aqui as informações básicas</span>
+    <form [formGroup]="formInfo" class="member-container-form-wrapper">
+      <div class="member-container-form-item">
+        <label for="name">Nome</label>
+        <input
+          formControlName="name"
+          nz-input
+          placeholder="ex: Fulano da Silva"
+          nzSize="large"
+          [nzStatus]="name.invalid && name.touched ? 'error' : ''"
+        />
+      </div>
+
+      <div class="member-container-form-item">
+        <label for="date">Data de nascimento</label>
+        <input
+          nz-input
+          nzSize="large"
+          formControlName="birthDate"
+          placeholder="ex: 05/12/2000"
+          mask="00/00/0000"
+          [nzStatus]="birthDate.invalid && birthDate.touched ? 'error' : ''"
+        />
+      </div>
+
+      <div class="member-container-form-item">
+        <label for="gender">Gênero</label>
+        <nz-select
+          formControlName="gender"
+          nzPlaceHolder="ex: Masculino"
+          nzSize="large"
+          [nzStatus]="gender.invalid && gender.touched ? 'error' : ''"
+        >
+          <ng-container *ngFor="let item of genders">
+            <nz-option [nzValue]="item.value" [nzLabel]="item.title"></nz-option>
+          </ng-container>
+        </nz-select>
+      </div>
+
+      <div class="member-container-form-item">
+        <label for="maritalStatus">Estado civil</label>
+        <nz-select
+          formControlName="maritalStatus"
+          nzPlaceHolder="ex: Casado(a)"
+          nzSize="large"
+          [nzStatus]="maritalStatus.invalid && maritalStatus.touched ? 'error' : ''"
+        >
+          <ng-container *ngFor="let item of maritalStatuses">
+            <nz-option [nzValue]="item.value" [nzLabel]="item.title"></nz-option>
+          </ng-container>
+        </nz-select>
+      </div>
+    </form>
+  </ng-container>
+
+  <!-- DADOS: CURRENT = 1 -->
+  <ng-container *ngIf="current === 1">
+    <span class="member-container-form-guide">Insira agora informações adicionais</span>
+    <form [formGroup]="formAdditionalInfo" class="member-container-form-wrapper">
+      <div class="member-container-form-item">
+        <label for="email">E-mail</label>
+        <input
+          type="email"
+          formControlName="email"
+          nz-input
+          placeholder="ex: fulano@gmail.com"
+          nzSize="large"
+          [nzStatus]="email.invalid && email.touched ? 'error' : ''"
+        />
+      </div>
+
+      <div class="member-container-form-item">
+        <label for="phone" class="optional">Contato</label>
+        <input
+          formControlName="phone"
+          nz-input
+          placeholder="ex: (83) 98600-0000"
+          nzSize="large"
+          [mask]="phoneMask"
+          [nzStatus]="phone.invalid && phone.touched ? 'error' : ''"
+        />
+      </div>
+
+      <div class="member-container-form-item">
+        <label for="phone">Categoria do membro</label>
+        <nz-radio-group formControlName="memberType">
+          <label nz-radio nzValue="MEMBER">Membro</label>
+          <label nz-radio nzValue="CONGREGANT">Congregado</label>
+        </nz-radio-group>
+      </div>
+
+      <div class="member-container-form-item">
+        <label for="entryDate" class="optional">Data de ingresso</label>
+        <input
+          nz-input
+          nzSize="large"
+          formControlName="entryDate"
+          placeholder="ex: 05/12/2000"
+          mask="00/00/0000"
+          [nzStatus]="entryDate.invalid && entryDate.touched ? 'error' : ''"
+        />
+      </div>
+
+      <div class="member-container-form-item">
+        <label for="entryCategory">Forma de ingresso</label>
+        <nz-select
+          formControlName="entryCategory"
+          nzPlaceHolder="ex: Transferëncia"
+          nzSize="large"
+          [nzStatus]="entryCategory.invalid && entryCategory.touched ? 'error' : ''"
+        >
+          <ng-container *ngFor="let item of entryCategories">
+            <nz-option [nzValue]="item.value" [nzLabel]="item.title"></nz-option>
+          </ng-container>
+        </nz-select>
+      </div>
+    </form>
+  </ng-container>
+
+  <!-- ENDEREÇO: CURRENT = 2 -->
+
+  <ng-container *ngIf="current === 2">
+    <span class="member-container-form-guide">Agora, adicione o endereço do membro</span>
+    <form [formGroup]="formAddress" class="member-container-form-wrapper address">
+      <ng-container *ngIf="current === 2">
+        <div class="member-container-form-item">
+          <label for="postalCode">CEP</label>
+          <input
+            formControlName="postalCode"
+            nz-input
+            placeholder="ex: 58415-530"
+            nzSize="large"
+            mask="00000-000"
+            [nzStatus]="postalCode.invalid && postalCode.touched ? 'error' : ''"
+            (blur)="onPostalCodeBlur()"
+          />
+        </div>
+        <div class="member-container-form-item">
+          <label for="street">Rua</label>
+          <input
+            formControlName="street"
+            nz-input
+            placeholder="ex: Av. Pres. Juscelino Kubitscheck"
+            nzSize="large"
+            [nzStatus]="street.invalid && street.touched ? 'error' : ''"
+          />
+        </div>
+        <div class="member-container-form-item">
+          <label for="number">Número</label>
+          <input
+            formControlName="number"
+            nz-input
+            placeholder="ex: 1400"
+            nzSize="large"
+            [nzStatus]="number.invalid && number.touched ? 'error' : ''"
+          />
+        </div>
+        <div class="member-container-form-item">
+          <label for="complement">Complemento</label>
+          <input formControlName="complement" nz-input placeholder="ex: Apto 604" nzSize="large" />
+        </div>
+        <div class="member-container-form-item">
+          <label for="neighborhood">Bairro</label>
+          <input
+            formControlName="neighborhood"
+            nz-input
+            placeholder="ex: Cruzeiro"
+            nzSize="large"
+            [nzStatus]="neighborhood.invalid && neighborhood.touched ? 'error' : ''"
+          />
+        </div>
+        <div class="member-container-form-item">
+          <label for="city">Cidade</label>
+          <input
+            formControlName="city"
+            nz-input
+            placeholder="ex: Campina Grande"
+            nzSize="large"
+            [nzStatus]="city.invalid && city.touched ? 'error' : ''"
+          />
+        </div>
+        <div class="member-container-form-item">
+          <label for="state">Estado</label>
+
+          <nz-select
+            formControlName="state"
+            nzPlaceHolder="ex: PB"
+            nzSize="large"
+            [nzStatus]="state.invalid && state.touched ? 'error' : ''"
+          >
+            <ng-container *ngFor="let item of states">
+              <nz-option [nzValue]="item.value" [nzLabel]="item.title"></nz-option>
+            </ng-container>
+          </nz-select>
+        </div>
+      </ng-container>
+    </form>
+  </ng-container>
+
+  <!-- IMAGEM: CURRENT = 3 -->
+  <ng-container *ngIf="current === 3">
+    <span class="member-container-form-guide"
+      >Gostaria de {{ isManagement ? 'atualizar' : 'adicionar' }} a foto do membro?</span
+    >
+    <div class="member-container-form-wrapper">
+      <div class="member-container-form-item upload">
+        <ngx-file-drop [ngStyle]="{ width: '100%' }" (onFileDrop)="onDrop($event)">
+          <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+            <span class="file-uploader-icon" nz-icon nzType="file-image" nzTheme="outline"></span>
+
+            <p class="file-uploader-description">
+              Arraste e solte uma imagem aqui ou clique para selecionar.
+            </p>
+
+            <button
+              class="file-uploader-button"
+              nz-button
+              nzSize="large"
+              nzType="primary"
+              type="button"
+              (click)="openFileSelector()"
+            >
+              Escolher Arquivo
+            </button>
+          </ng-template>
+        </ngx-file-drop>
+
+        <div *ngIf="avatarUrl" class="file-uploader-preview">
+          <img [src]="avatarUrl" alt="Preview da Imagem" />
+          <div class="file-uploader-preview-data">
+            <span
+              ><span nz-icon nzType="paper-clip" nzTheme="outline"></span>
+              {{ selectedImage?.name || '' }}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="member-container-form-footer">
+    <button
+      *ngIf="isManagement && isManageable"
+      nz-button
+      [nzDanger]="!member.isArchived"
+      nzType="default"
+      nzSize="large"
+      (click)="onArchive()"
+      [ngStyle]="{ marginRight: 'auto' }"
+    >
+      <span nz-icon nzType="inbox" nzTheme="outline"></span>
+      {{ member.isArchived ? 'Desarquivar' : 'Arquivar' }}
+    </button>
+    <button nz-button nzType="default" nzSize="large" (click)="pre()" *ngIf="current > 0">
+      <span>Voltar</span>
+    </button>
+    <button
+      *ngIf="current < 3"
+      nz-button
+      nzType="primary"
+      nzSize="large"
+      [disabled]="
+        (current === 0 && formInfo.invalid) ||
+        (current === 1 && formAdditionalInfo.invalid) ||
+        (current === 2 && formAddress.invalid) ||
+        !isManageable
+      "
+      (click)="next()"
+    >
+      <span>Próximo</span>
+    </button>
+    <button
+      nz-button
+      nzType="primary"
+      nzSize="large"
+      [nzLoading]="isSubmitting"
+      (click)="onSubmit()"
+      *ngIf="current === 3"
+    >
+      <span>{{
+        isManagement ? 'Atualizar' : selectedImage ? 'Cadastrar' : 'Cadastrar sem imagem'
+      }}</span>
+    </button>
+  </div>
+</div>

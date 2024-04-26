@@ -1,0 +1,10 @@
+<ng-container *ngIf="isLoading; else done">
+  <app-custom-loader></app-custom-loader>
+</ng-container>
+<ng-template #done>
+  <app-serie-page
+    [serie]="serie"
+    [isManageable]="isManageable"
+    (onDeleteLesson)="openDeleteLessonConfirm($event)"
+  ></app-serie-page>
+</ng-template>

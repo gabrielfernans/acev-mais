@@ -1,0 +1,18 @@
+<ng-container *ngIf="isLoading; else done">
+  <app-custom-loader></app-custom-loader>
+</ng-container>
+<ng-template #done>
+  <app-agrupe-page
+    [agrupe]="agrupe"
+    [isManageable]="isManageable"
+    [foundMembers]="foundMembers"
+    [coordinates]="coordinates"
+    [isModalOpen]="isModalOpen"
+    [isLoadingMember]="isLoadingMember"
+    [isLoadingAddress]="isLoadingAddress"
+    (memberAdd)="addMemberRole($event)"
+    (memberRoleChange)="handleMemberRole($event)"
+    (memberSearch)="onMemberSearch($event)"
+    (modalChange)="isModalOpen = !isModalOpen"
+  ></app-agrupe-page>
+</ng-template>

@@ -1,0 +1,21 @@
+<app-custom-loader *ngIf="isLoading"></app-custom-loader>
+<app-custom-loader *ngIf="isLoading"></app-custom-loader>
+<div class="agrupe-meeting-form-container" *ngIf="!isLoading">
+  <div class="agrupe-meeting-form-container-section illustration">
+    <img src="/assets/img/add.jpg" alt="Add wallpaper" />
+  </div>
+  <div class="agrupe-meeting-form-container-section">
+    <app-agrupe-meeting-form-page
+      [agrupeMeeting]="agrupeMeeting"
+      [agrupes]="agrupes"
+      [series]="series"
+      [isManagement]="isManagement"
+      [isLoadingMember]="isLoadingMember"
+      [foundMembers]="foundMembers"
+      [isSubmitting]="isSubmitting"
+      (submit)="submit($event)"
+      (memberSearch)="onMemberSearch($event)"
+      (deleteAgrupeMeeting)="openDeleteConfirm()"
+    ></app-agrupe-meeting-form-page>
+  </div>
+</div>

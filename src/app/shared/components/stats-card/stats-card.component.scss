@@ -1,0 +1,25 @@
+.stats-card-container {
+  display: flex;
+  gap: 1rem;
+
+  &-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 3rem;
+    width: 3rem;
+    border-radius: 0.25rem;
+    font-size: 1.75rem;
+  }
+
+  &-data {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    h1,
+    p {
+      margin: 0;
+    }
+  }
+}

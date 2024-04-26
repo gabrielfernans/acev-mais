@@ -1,0 +1,16 @@
+<app-custom-loader *ngIf="isLoading"></app-custom-loader>
+<div class="series-form-container" *ngIf="!isLoading">
+  <div class="series-form-container-section illustration">
+    <img src="/assets/img/add.jpg" alt="Add wallpaper" />
+  </div>
+  <div class="series-form-container-section">
+    <app-series-form-page
+      [series]="series"
+      [isManageable]="isManageable"
+      [isManagement]="isManagement"
+      [isSubmitting]="isSubmitting"
+      (submit)="submit($event)"
+      (deleteSeries)="openDeleteConfirm()"
+    ></app-series-form-page>
+  </div>
+</div>

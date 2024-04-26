@@ -1,0 +1,16 @@
+<app-custom-loader *ngIf="isLoading"></app-custom-loader>
+<div class="member-form-container" *ngIf="!isLoading">
+  <div class="member-form-container-section illustration">
+    <img src="/assets/img/add.jpg" alt="Add wallpaper" />
+  </div>
+  <div class="member-form-container-section">
+    <app-member-form-page
+      [member]="member"
+      [isManageable]="isManageable"
+      [isManagement]="isManagement"
+      [isSubmitting]="isSubmitting"
+      (submit)="submit($event)"
+      (archiveMember)="openArchiveConfirm($event)"
+    ></app-member-form-page>
+  </div>
+</div>

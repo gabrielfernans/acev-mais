@@ -1,0 +1,140 @@
+<div class="lesson-container-form">
+  <nz-steps [nzCurrent]="current" nzSize="small">
+    <nz-step nzTitle="Dados"> </nz-step>
+    <nz-step nzTitle="Arquivo"> </nz-step>
+  </nz-steps>
+
+  <!-- DADOS: CURRENT = 0 -->
+  <ng-container *ngIf="current === 0">
+    <span class="lesson-container-form-guide">Insira aqui as informações básicas</span>
+    <form [formGroup]="formInfo" class="lesson-container-form-wrapper">
+      <div class="lesson-container-form-item">
+        <label for="title">Título</label>
+        <input
+          formControlName="title"
+          nz-input
+          placeholder="ex: Estudo 1 - O caráter da humanidade"
+          nzSize="large"
+          [nzStatus]="title.invalid && title.touched ? 'error' : ''"
+        />
+      </div>
+      <div class="lesson-container-form-item">
+        <label for="origin" class="optional">Fonte</label>
+        <input formControlName="origin" nz-input placeholder="ex: IBC BH" nzSize="large" />
+      </div>
+      <div class="lesson-container-form-item">
+        <label for="adaptation" class="optional">Adaptação</label>
+        <input
+          formControlName="adaptation"
+          nz-input
+          placeholder="ex: Pr. Wostenes"
+          nzSize="large"
+        />
+      </div>
+      <div class="lesson-container-form-item">
+        <label for="revision" class="optional">Revisão</label>
+        <input
+          formControlName="revision"
+          nz-input
+          placeholder="ex: Pr. Fabricio Jr"
+          nzSize="large"
+        />
+      </div>
+      <div class="lesson-container-form-item">
+        <label for="greeting" class="optional">Saudações</label>
+        <input
+          formControlName="greeting"
+          nz-input
+          placeholder="ex: Deus os abençoe e lhes dê muitos frutos para o louvor da Sua Glória!"
+          nzSize="large"
+        />
+      </div>
+    </form>
+  </ng-container>
+
+  <!-- IMAGEM: CURRENT = 1 -->
+  <ng-container *ngIf="current === 1">
+    <span class="lesson-container-form-guide">
+      {{
+        isManagement
+          ? 'Gostaria de atualizar o arquivo PDF do estudo?'
+          : 'Adicione o arquivo PDF do estudo'
+      }}
+    </span>
+    <div class="lesson-container-form-wrapper">
+      <div class="lesson-container-form-item upload">
+        <!-- Componente de upload de arquivo -->
+        <ngx-file-drop [ngStyle]="{ width: '100%' }" (onFileDrop)="onDrop($event)">
+          <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+            <span class="file-uploader-icon" nz-icon nzType="file-image" nzTheme="outline"></span>
+
+            <p class="file-uploader-description">
+              Arraste e solte o PDF aqui ou clique para selecionar.
+            </p>
+
+            <button
+              class="file-uploader-button"
+              nz-button
+              nzSize="large"
+              nzType="primary"
+              type="button"
+              (click)="openFileSelector()"
+            >
+              Escolher Arquivo
+            </button>
+          </ng-template>
+        </ngx-file-drop>
+
+        <!-- Preview da imagem -->
+        <div *ngIf="fileUrl" class="file-uploader-preview">
+          <img src="/assets/img/pdf.png" alt="Preview da Imagem" />
+          <div class="file-uploader-preview-data">
+            <span
+              ><span nz-icon nzType="paper-clip" nzTheme="outline"></span>
+              {{ selectedFile?.name || fileUrl }}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="lesson-container-form-footer">
+    <button
+      *ngIf="isManagement && isManageable"
+      nz-button
+      nzDanger
+      nzType="default"
+      nzSize="large"
+      (click)="onDelete()"
+      [ngStyle]="{ marginRight: 'auto' }"
+    >
+      <span nz-icon nzType="delete" nzTheme="outline"></span>
+      Excluir
+    </button>
+    <button nz-button nzType="default" nzSize="large" (click)="pre()" *ngIf="current > 0">
+      <span>Voltar</span>
+    </button>
+    <button
+      *ngIf="current < 1"
+      nz-button
+      nzType="primary"
+      nzSize="large"
+      [disabled]="(current === 0 && formInfo.invalid) || !isManageable"
+      (click)="next()"
+    >
+      <span>Próximo</span>
+    </button>
+    <button
+      nz-button
+      nzType="primary"
+      nzSize="large"
+      [nzLoading]="isSubmitting"
+      [disabled]="!fileUrl"
+      (click)="onSubmit()"
+      *ngIf="current === 1"
+    >
+      <span>{{ isManagement ? 'Atualizar' : 'Cadastrar' }}</span>
+    </button>
+  </div>
+</div>

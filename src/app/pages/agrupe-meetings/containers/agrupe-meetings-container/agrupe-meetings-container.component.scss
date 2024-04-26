@@ -1,0 +1,9 @@
+.actions-container {
+  display: flex;
+  justify-content: flex-start;
+  gap: 1rem;
+
+  :last-child {
+    margin-left: auto;
+  }
+}

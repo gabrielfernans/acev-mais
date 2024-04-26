@@ -1,0 +1,64 @@
+<div class="ministries-container">
+  <div class="ministries-container-content">
+    <ng-container *ngFor="let ministry of ministries; let i = index">
+      <div
+        class="ministries-container-content-card"
+        [routerLink]="['/ministries', ministry.id]"
+        [ngStyle]="{
+          'background-color': !ministry.photoUrl
+            ? ministriesMetadata[i].backgroundColor
+            : 'var(--custom-background-secondary-color)',
+          'background-image': !ministry.photoUrl
+            ? ministriesMetadata[i].backgroundImage
+            : 'var(--custom-background-secondary-color)'
+        }"
+      >
+        <div
+          class="ministries-container-content-card-bg"
+          [ngStyle]="{
+            background: 'url(' + ministry.photoUrl + ')'
+          }"
+        ></div>
+
+        <nz-avatar-group class="ministries-container-content-card-avatars">
+          <ng-container *ngFor="let members of ministry.members.slice(0, 3); let i = index">
+            <nz-avatar
+              style="background-color: var(--custom-primary-teal)"
+              [nzSrc]="members.photoUrl"
+              [nzText]="getAvatarText(members, ministry)"
+            ></nz-avatar>
+          </ng-container>
+        </nz-avatar-group>
+
+        <div class="ministries-container-content-card-data">
+          <h3>{{ ministry.name }}</h3>
+          <ng-container *ngFor="let leader of ministry.leaders">
+            <span>{{ leader.name.split(' ')[0] }}</span>
+          </ng-container>
+        </div>
+        <button
+          class="ministries-container-content-card-button"
+          nz-button
+          nzType="default"
+          nzShape="circle"
+        >
+          <span nz-icon nzType="right"></span>
+        </button>
+      </div>
+      <ng-template #coverTemplate> </ng-template>
+    </ng-container>
+  </div>
+</div>
+
+<ng-template #inputClearTpl>
+  <span
+    nz-icon
+    class="ant-input-clear-icon"
+    nzTheme="fill"
+    nzType="close-circle"
+    *ngIf="searchValue"
+    (click)="searchValue = null"
+  ></span>
+</ng-template>
+
+<ng-template #prefixTemplateSearch><span nz-icon nzType="search"></span></ng-template>

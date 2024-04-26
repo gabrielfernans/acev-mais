@@ -1,0 +1,223 @@
+<div class="agrupe-container-form">
+  <nz-steps [nzCurrent]="current" nzSize="small">
+    <nz-step nzTitle="Dados"> </nz-step>
+    <nz-step nzTitle="Endereço"> </nz-step>
+    <nz-step nzTitle="Imagem"> </nz-step>
+  </nz-steps>
+
+  <!-- DADOS: CURRENT = 0 -->
+  <ng-container *ngIf="current === 0">
+    <span class="agrupe-container-form-guide">Insira aqui as informações básicas</span>
+    <form [formGroup]="formInfo" class="agrupe-container-form-wrapper">
+      <div class="agrupe-container-form-item">
+        <label for="name">Nome</label>
+        <input
+          formControlName="name"
+          nz-input
+          placeholder="ex: Agrupe do Cruzeiro"
+          nzSize="large"
+          [nzStatus]="name.invalid && name.touched ? 'error' : ''"
+        />
+      </div>
+      <div class="agrupe-container-form-item">
+        <label for="description" class="optional">Descrição</label>
+        <textarea
+          rows="2"
+          nz-input
+          formControlName="description"
+          placeholder="Descreva informações adicionais sobre este agrupe"
+          nzSize="large"
+        ></textarea>
+      </div>
+      <div class="agrupe-container-form-item">
+        <label for="category">Categoria</label>
+        <nz-select
+          formControlName="category"
+          nzPlaceHolder="ex: Jovens"
+          nzSize="large"
+          [nzStatus]="category.invalid && category.touched ? 'error' : ''"
+        >
+          <ng-container *ngFor="let item of categories">
+            <nz-option [nzValue]="item.category" [nzLabel]="item.title"></nz-option>
+          </ng-container>
+        </nz-select>
+      </div>
+      <div class="agrupe-container-form-item">
+        <label for="dayOfMeeting">Dia de encontro</label>
+        <nz-select
+          formControlName="dayOfMeeting"
+          nzPlaceHolder="ex: Sábado"
+          nzSize="large"
+          [nzStatus]="dayOfMeeting.invalid && dayOfMeeting.touched ? 'error' : ''"
+        >
+          <ng-container *ngFor="let item of weekdays">
+            <nz-option [nzValue]="item.day" [nzLabel]="item.title"></nz-option>
+          </ng-container>
+        </nz-select>
+      </div>
+    </form>
+  </ng-container>
+
+  <!-- ENDEREÇO: CURRENT = 1 -->
+
+  <ng-container *ngIf="current === 1">
+    <span class="agrupe-container-form-guide">Agora, adicione o endereço do agrupe</span>
+    <form [formGroup]="formAddress" class="agrupe-container-form-wrapper address">
+      <ng-container *ngIf="current === 1">
+        <div class="agrupe-container-form-item">
+          <label for="postalCode">CEP</label>
+          <input
+            formControlName="postalCode"
+            nz-input
+            placeholder="ex: 58415-530"
+            nzSize="large"
+            mask="00000-000"
+            [nzStatus]="postalCode.invalid && postalCode.touched ? 'error' : ''"
+            (blur)="onPostalCodeBlur()"
+          />
+        </div>
+        <div class="agrupe-container-form-item">
+          <label for="street">Rua</label>
+          <input
+            formControlName="street"
+            nz-input
+            placeholder="ex: Av. Pres. Juscelino Kubitscheck"
+            nzSize="large"
+            [nzStatus]="street.invalid && street.touched ? 'error' : ''"
+          />
+        </div>
+        <div class="agrupe-container-form-item">
+          <label for="number">Número</label>
+          <input
+            formControlName="number"
+            nz-input
+            placeholder="ex: 1400"
+            nzSize="large"
+            [nzStatus]="number.invalid && number.touched ? 'error' : ''"
+          />
+        </div>
+        <div class="agrupe-container-form-item">
+          <label for="complement">Complemento</label>
+          <input formControlName="complement" nz-input placeholder="ex: Apto 604" nzSize="large" />
+        </div>
+        <div class="agrupe-container-form-item">
+          <label for="neighborhood">Bairro</label>
+          <input
+            formControlName="neighborhood"
+            nz-input
+            placeholder="ex: Cruzeiro"
+            nzSize="large"
+            [nzStatus]="neighborhood.invalid && neighborhood.touched ? 'error' : ''"
+          />
+        </div>
+        <div class="agrupe-container-form-item">
+          <label for="city">Cidade</label>
+          <input
+            formControlName="city"
+            nz-input
+            placeholder="ex: Campina Grande"
+            nzSize="large"
+            [nzStatus]="city.invalid && city.touched ? 'error' : ''"
+          />
+        </div>
+        <div class="agrupe-container-form-item">
+          <label for="state">Estado</label>
+
+          <nz-select
+            formControlName="state"
+            nzPlaceHolder="ex: PB"
+            nzSize="large"
+            [nzStatus]="state.invalid && state.touched ? 'error' : ''"
+          >
+            <ng-container *ngFor="let item of states">
+              <nz-option [nzValue]="item.value" [nzLabel]="item.title"></nz-option>
+            </ng-container>
+          </nz-select>
+        </div>
+      </ng-container>
+    </form>
+  </ng-container>
+
+  <!-- IMAGEM: CURRENT = 2 -->
+  <ng-container *ngIf="current === 2">
+    <span class="agrupe-container-form-guide"
+      >Gostaria de {{ isManagement ? 'atualizar' : 'adicionar' }} a foto do agrupe?</span
+    >
+    <div class="agrupe-container-form-wrapper">
+      <div class="agrupe-container-form-item upload">
+        <!-- Componente de upload de arquivo -->
+        <ngx-file-drop [ngStyle]="{ width: '100%' }" (onFileDrop)="onDrop($event)">
+          <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+            <span class="file-uploader-icon" nz-icon nzType="file-image" nzTheme="outline"></span>
+
+            <p class="file-uploader-description">
+              Arraste e solte uma imagem aqui ou clique para selecionar.
+            </p>
+
+            <button
+              class="file-uploader-button"
+              nz-button
+              nzSize="large"
+              nzType="primary"
+              type="button"
+              (click)="openFileSelector()"
+            >
+              Escolher Arquivo
+            </button>
+          </ng-template>
+        </ngx-file-drop>
+
+        <!-- Preview da imagem -->
+        <div *ngIf="avatarUrl" class="file-uploader-preview">
+          <img [src]="avatarUrl" alt="Preview da Imagem" />
+          <div class="file-uploader-preview-data">
+            <span
+              ><span nz-icon nzType="paper-clip" nzTheme="outline"></span>
+              {{ selectedImage?.name || '' }}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="agrupe-container-form-footer">
+    <button
+      *ngIf="isManagement && isManageable"
+      nz-button
+      [nzDanger]="!agrupe.isArchived"
+      nzType="default"
+      nzSize="large"
+      (click)="onArchive()"
+      [ngStyle]="{ marginRight: 'auto' }"
+    >
+      <span nz-icon nzType="inbox" nzTheme="outline"></span>
+      {{ agrupe.isArchived ? 'Desarquivar' : 'Arquivar' }}
+    </button>
+    <button nz-button nzType="default" nzSize="large" (click)="pre()" *ngIf="current > 0">
+      <span>Voltar</span>
+    </button>
+    <button
+      *ngIf="current < 2"
+      nz-button
+      nzType="primary"
+      nzSize="large"
+      [disabled]="(current === 0 && formInfo.invalid) || (current === 1 && formAddress.invalid)"
+      (click)="next()"
+    >
+      <span>Próximo</span>
+    </button>
+    <button
+      nz-button
+      nzType="primary"
+      nzSize="large"
+      [nzLoading]="isSubmitting"
+      (click)="onSubmit()"
+      *ngIf="current === 2"
+    >
+      <span>{{
+        isManagement ? 'Atualizar' : selectedImage ? 'Cadastrar' : 'Cadastrar sem imagem'
+      }}</span>
+    </button>
+  </div>
+</div>

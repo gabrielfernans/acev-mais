@@ -1,0 +1,120 @@
+<div class="ministry-container-form">
+  <nz-steps [nzCurrent]="current" nzSize="small">
+    <nz-step nzTitle="Dados"> </nz-step>
+    <nz-step nzTitle="Imagem"> </nz-step>
+  </nz-steps>
+
+  <!-- DADOS: CURRENT = 0 -->
+  <ng-container *ngIf="current === 0">
+    <span class="ministry-container-form-guide">Insira aqui as informações básicas</span>
+    <form [formGroup]="formInfo" class="ministry-container-form-wrapper">
+      <div class="ministry-container-form-item">
+        <label for="name">Nome</label>
+        <input
+          formControlName="name"
+          nz-input
+          placeholder="ex: Ministério de recepção"
+          nzSize="large"
+          [nzStatus]="name.invalid && name.touched ? 'error' : ''"
+        />
+      </div>
+      <div class="ministry-container-form-item">
+        <label for="description" class="optional">Descrição</label>
+        <textarea
+          rows="2"
+          nz-input
+          formControlName="description"
+          placeholder="Descreva informações adicionais sobre este ministério"
+          nzSize="large"
+        ></textarea>
+      </div>
+      <div class="ministry-container-form-item">
+        <label for="date" class="optional">Data de fundação</label>
+        <nz-date-picker formControlName="foundation" [nzFormat]="'dd/MM/yyyy'"></nz-date-picker>
+      </div>
+    </form>
+  </ng-container>
+
+  <!-- IMAGEM: CURRENT = 1 -->
+  <ng-container *ngIf="current === 1">
+    <span class="ministry-container-form-guide"
+      >Gostaria de {{ isManagement ? 'atualizar' : 'adicionar' }} a foto do ministério?</span
+    >
+    <div class="ministry-container-form-wrapper">
+      <div class="ministry-container-form-item upload">
+        <!-- Componente de upload de arquivo -->
+        <ngx-file-drop [ngStyle]="{ width: '100%' }" (onFileDrop)="onDrop($event)">
+          <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+            <span class="file-uploader-icon" nz-icon nzType="file-image" nzTheme="outline"></span>
+
+            <p class="file-uploader-description">
+              Arraste e solte uma imagem aqui ou clique para selecionar.
+            </p>
+
+            <button
+              class="file-uploader-button"
+              nz-button
+              nzSize="large"
+              nzType="primary"
+              type="button"
+              (click)="openFileSelector()"
+            >
+              Escolher Arquivo
+            </button>
+          </ng-template>
+        </ngx-file-drop>
+
+        <!-- Preview da imagem -->
+        <div *ngIf="avatarUrl" class="file-uploader-preview">
+          <img [src]="avatarUrl" alt="Preview da Imagem" />
+          <div class="file-uploader-preview-data">
+            <span
+              ><span nz-icon nzType="paper-clip" nzTheme="outline"></span>
+              {{ selectedImage?.name || '' }}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="ministry-container-form-footer">
+    <button
+      *ngIf="isManagement && isManageable"
+      nz-button
+      [nzDanger]="!ministry.isArchived"
+      nzType="default"
+      nzSize="large"
+      (click)="onArchive()"
+      [ngStyle]="{ marginRight: 'auto' }"
+    >
+      <span nz-icon nzType="inbox" nzTheme="outline"></span>
+      {{ ministry.isArchived ? 'Desarquivar' : 'Arquivar' }}
+    </button>
+    <button nz-button nzType="default" nzSize="large" (click)="pre()" *ngIf="current > 0">
+      <span>Voltar</span>
+    </button>
+    <button
+      *ngIf="current < 1"
+      nz-button
+      nzType="primary"
+      nzSize="large"
+      [disabled]="(current === 0 && formInfo.invalid) || !isManageable"
+      (click)="next()"
+    >
+      <span>Próximo</span>
+    </button>
+    <button
+      nz-button
+      nzType="primary"
+      nzSize="large"
+      [nzLoading]="isSubmitting"
+      (click)="onSubmit()"
+      *ngIf="current === 1"
+    >
+      <span>{{
+        isManagement ? 'Atualizar' : selectedImage ? 'Cadastrar' : 'Cadastrar sem imagem'
+      }}</span>
+    </button>
+  </div>
+</div>

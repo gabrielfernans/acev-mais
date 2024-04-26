@@ -1,0 +1,240 @@
+<div class="ministry-container">
+  <div class="ministry-container-side">
+    <div class="ministry-container-side-profile">
+      <ng-container *ngIf="ministry?.photoUrl; else userGenericPhoto">
+        <div class="ministry-container-side-profile-photo">
+          <div
+            class="ministry-container-side-profile-photo-content"
+            [ngStyle]="{ background: 'url(' + ministry.photoUrl + ')' }"
+          ></div>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="ministry-container-side-data-leadership">
+      <label for="name">Liderança</label>
+      <ng-container *ngIf="leadership.length === 0; else leaders">
+        <p>Não há líderança cadastrada</p>
+      </ng-container>
+      <ng-template #leaders>
+        <nz-avatar-group class="ministry-container-side-data-leadership-avatars">
+          <ng-container *ngFor="let leader of leadership; let i = index">
+            <ng-container *ngIf="leader.photoUrl; else noPic">
+              <nz-avatar
+                [nzSize]="48"
+                [nzSrc]="leader.photoUrl"
+                style="background-color: var(--custom-background-secondary-color)"
+              ></nz-avatar>
+            </ng-container>
+            <ng-template #noPic>
+              <nz-avatar
+                [nzSize]="48"
+                [ngStyle]="{
+                  backgroundColor: ministryCards[0].backgroundColor,
+                  color: ministryCards[0].color
+                }"
+                [nzText]="leader.initials"
+              ></nz-avatar>
+            </ng-template>
+          </ng-container>
+        </nz-avatar-group>
+      </ng-template>
+
+      <ng-container *ngFor="let leader of leadership; let i = index">
+        <p>{{ leader.name }} ({{ isMemberLeader(leader.id) ? 'Líder' : 'Aprendiz' }})</p>
+      </ng-container>
+    </div>
+
+    <div class="ministry-container-side-actions" *ngIf="isManageable">
+      <button nz-button nzSize="large" nzType="primary" (click)="manageMinistry()">
+        <span nz-icon nzType="setting" nzTheme="outline"></span>
+        Gerenciar ministério
+      </button>
+    </div>
+  </div>
+  <div class="ministry-container-content">
+    <div class="ministry-container-content-cards">
+      <ng-container *ngFor="let card of ministryCards">
+        <app-custom-stats-card
+          [title]="card.title"
+          [value]="card.value"
+          [icon]="card.icon"
+          [color]="card.color"
+          [backgroundColor]="card.backgroundColor"
+        ></app-custom-stats-card>
+      </ng-container>
+    </div>
+
+    <ul nz-menu nzMode="horizontal">
+      <ng-container *ngFor="let menu of menus">
+        <li
+          nz-menu-item
+          [nzSelected]="activeMenu === menu.value"
+          (click)="onChangeMenu(menu.value)"
+        >
+          <span nz-icon [nzType]="menu.icon"></span>
+          {{ menu.title }}
+        </li>
+      </ng-container>
+    </ul>
+
+    <div class="ministry-container-content-dynamic">
+      <ng-container *ngIf="activeMenu === 'members'">
+        <div class="actions-container" *ngIf="isManageable">
+          <button nz-button nzType="primary" (click)="changeModal()">
+            <span nz-icon nzType="user-add" nzTheme="outline"></span>
+            Adicionar membro
+          </button>
+        </div>
+
+        <nz-table
+          class="ministry-container-content-dynamic-table"
+          #basicTable
+          nzSize="small"
+          [nzData]="ministry.members"
+          [nzShowPagination]="false"
+          [nzNoResult]="noData"
+        >
+          <thead>
+            <tr>
+              <ng-container *ngFor="let column of tableColumns">
+                <th [nzColumnKey]="column.key" [nzAlign]="column.align ? column.align : 'left'">
+                  {{ column.name }}
+                </th>
+              </ng-container>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let member of ministry.members">
+              <td>
+                <ng-container *ngIf="member.photoUrl; else noPic">
+                  <nz-avatar
+                    [nzSize]="28"
+                    [nzSrc]="member.photoUrl"
+                    style="background-color: var(--custom-background-secondary-color)"
+                  ></nz-avatar>
+                </ng-container>
+                <ng-template #noPic>
+                  <nz-avatar
+                    [nzSize]="28"
+                    [ngStyle]="{
+                      color: ministryCards[0].color,
+                      backgroundColor: ministryCards[0].backgroundColor
+                    }"
+                    [nzIcon]="'user'"
+                  ></nz-avatar>
+                </ng-template>
+
+                <a [routerLink]="['/members', member.id]">{{ member.name }}</a>
+              </td>
+              <td nzAlign="center">
+                <app-custom-tag
+                  [backgroundColor]="'var(--custom-primary-teal)'"
+                  [value]="
+                    isMemberLeader(member.id)
+                      ? 'Líder'
+                      : isMemberApprentice(member.id)
+                        ? 'Aprendiz'
+                        : 'Membro'
+                  "
+                ></app-custom-tag>
+              </td>
+              <td nzAlign="center" *ngIf="isManageable">
+                <button nz-button nzType="default" nz-dropdown [nzDropdownMenu]="menu">
+                  <span nz-icon nzType="ellipsis"></span>
+                </button>
+                <nz-dropdown-menu #menu="nzDropdownMenu">
+                  <ul nz-menu nzSelectable>
+                    <li nz-menu-item [routerLink]="['/members', member.id]">
+                      <span nz-icon nzType="eye" nzTheme="outline"></span>
+                      Ver perfil
+                    </li>
+                    <ng-container *ngIf="!isMemberLeader(member.id)">
+                      <li nz-menu-item (click)="addMemberRole(member, leaderRole)">
+                        <span nz-icon nzType="user-switch" nzTheme="outline"></span>
+                        Tornar líder
+                      </li>
+                    </ng-container>
+                    <ng-container *ngIf="!isMemberApprentice(member.id)">
+                      <li nz-menu-item (click)="addMemberRole(member, apprenticeRole)">
+                        <span nz-icon nzType="user-switch" nzTheme="outline"></span>
+                        Tornar aprendiz
+                      </li>
+                    </ng-container>
+                    <ng-container *ngIf="isMemberLeader(member.id)">
+                      <li nz-menu-item (click)="removeMemberRole(member, leaderRole)">
+                        <span nz-icon nzType="disconnect" nzTheme="outline"></span>
+                        Remover liderança
+                      </li>
+                    </ng-container>
+                    <ng-container *ngIf="isMemberApprentice(member.id)">
+                      <li nz-menu-item (click)="removeMemberRole(member, apprenticeRole)">
+                        <span nz-icon nzType="disconnect" nzTheme="outline"></span>
+                        Remover aprendizado
+                      </li>
+                    </ng-container>
+                    <li nz-menu-item (click)="removeMember(member)" nzDanger>
+                      <span nz-icon nzType="disconnect" nzTheme="outline"></span>
+                      Desvincular membro
+                    </li>
+                  </ul>
+                </nz-dropdown-menu>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<nz-modal
+  nzTitle="Adicionar membro"
+  nzOkText="Adicionar"
+  [(nzVisible)]="isModalOpen"
+  [nzOkLoading]="isLoadingMember"
+  (nzOnCancel)="changeModal()"
+  (nzOnOk)="addMember()"
+>
+  <ng-container *nzModalContent>
+    <nz-select
+      nzAllowClear
+      nzShowSearch
+      nzServerSearch
+      nzPlaceHolder="Digite o nome do membro"
+      [(ngModel)]="selectedUser"
+      (nzOnSearch)="onSearchMembers($event)"
+    >
+      <ng-container *ngFor="let member of foundMembers">
+        <nz-option
+          *ngIf="!isLoadingMember"
+          [nzValue]="member.id"
+          [nzLabel]="member.name"
+          [nzDisabled]="isMemberAlreadyAdded(member.id)"
+        >
+          ></nz-option
+        >
+      </ng-container>
+      <nz-option *ngIf="isLoadingMember" nzDisabled nzCustomContent>
+        <span nz-icon nzType="loading" class="loading-icon"></span>
+        Procurando...
+      </nz-option>
+    </nz-select>
+    <label>
+      Selecione o membro que deseja adicionar. Se o membro estiver cadastrado em outro ministério,
+      ele será desvinculado.
+    </label>
+  </ng-container>
+</nz-modal>
+
+<ng-template #userGenericPhoto>
+  <div class="ministry-container-side-profile-photo">
+    <div class="ministry-container-side-profile-photo-content generic"></div>
+  </div>
+</ng-template>
+
+<ng-template #noData>
+  <div class="ministry-container-empty">
+    <nz-empty [nzNotFoundContent]="'Não há membros cadastrados neste ministério.'"></nz-empty>
+  </div>
+</ng-template>

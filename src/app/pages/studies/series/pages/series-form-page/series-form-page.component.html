@@ -1,0 +1,124 @@
+<div class="series-container-form">
+  <nz-steps [nzCurrent]="current" nzSize="small">
+    <nz-step nzTitle="Dados"> </nz-step>
+    <nz-step nzTitle="Imagem"> </nz-step>
+  </nz-steps>
+
+  <!-- DADOS: CURRENT = 0 -->
+  <ng-container *ngIf="current === 0">
+    <span class="series-container-form-guide">Insira aqui as informações básicas</span>
+    <form [formGroup]="formInfo" class="series-container-form-wrapper">
+      <div class="series-container-form-item">
+        <label for="title">Título</label>
+        <input
+          formControlName="title"
+          nz-input
+          placeholder="ex: O evangelho de Jesus Cristo"
+          nzSize="large"
+          [nzStatus]="title.invalid && title.touched ? 'error' : ''"
+        />
+      </div>
+      <div class="series-container-form-item">
+        <label for="author" class="optional">Nome do autor</label>
+        <input
+          formControlName="author"
+          nz-input
+          placeholder="ex: Pr. Wostenes Santos"
+          nzSize="large"
+        />
+      </div>
+      <div class="series-container-form-item">
+        <label for="period" class="optional">Período</label>
+        <input
+          formControlName="period"
+          nz-input
+          placeholder="ex: 15 de Janeiro à 22 de Janeiro"
+          nzSize="large"
+        />
+      </div>
+    </form>
+  </ng-container>
+
+  <!-- IMAGEM: CURRENT = 1 -->
+  <ng-container *ngIf="current === 1">
+    <span class="series-container-form-guide"
+      >Gostaria de {{ isManagement ? 'atualizar' : 'adicionar' }} a foto da série?</span
+    >
+    <div class="series-container-form-wrapper">
+      <div class="series-container-form-item upload">
+        <!-- Componente de upload de arquivo -->
+        <ngx-file-drop [ngStyle]="{ width: '100%' }" (onFileDrop)="onDrop($event)">
+          <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+            <span class="file-uploader-icon" nz-icon nzType="file-image" nzTheme="outline"></span>
+
+            <p class="file-uploader-description">
+              Arraste e solte uma imagem aqui ou clique para selecionar.
+            </p>
+
+            <button
+              class="file-uploader-button"
+              nz-button
+              nzSize="large"
+              nzType="primary"
+              type="button"
+              (click)="openFileSelector()"
+            >
+              Escolher Arquivo
+            </button>
+          </ng-template>
+        </ngx-file-drop>
+
+        <!-- Preview da imagem -->
+        <div *ngIf="avatarUrl" class="file-uploader-preview">
+          <img [src]="avatarUrl" alt="Preview da Imagem" />
+          <div class="file-uploader-preview-data">
+            <span
+              ><span nz-icon nzType="paper-clip" nzTheme="outline"></span>
+              {{ selectedImage?.name || '' }}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="series-container-form-footer">
+    <button
+      *ngIf="isManagement && isManageable"
+      nz-button
+      nzDanger
+      nzType="default"
+      nzSize="large"
+      (click)="onDelete()"
+      [ngStyle]="{ marginRight: 'auto' }"
+    >
+      <span nz-icon nzType="delete" nzTheme="outline"></span>
+      Excluir
+    </button>
+    <button nz-button nzType="default" nzSize="large" (click)="pre()" *ngIf="current > 0">
+      <span>Voltar</span>
+    </button>
+    <button
+      *ngIf="current < 1"
+      nz-button
+      nzType="primary"
+      nzSize="large"
+      [disabled]="(current === 0 && formInfo.invalid) || !isManageable"
+      (click)="next()"
+    >
+      <span>Próximo</span>
+    </button>
+    <button
+      nz-button
+      nzType="primary"
+      nzSize="large"
+      [nzLoading]="isSubmitting"
+      (click)="onSubmit()"
+      *ngIf="current === 1"
+    >
+      <span>{{
+        isManagement ? 'Atualizar' : selectedImage ? 'Cadastrar' : 'Cadastrar sem imagem'
+      }}</span>
+    </button>
+  </div>
+</div>

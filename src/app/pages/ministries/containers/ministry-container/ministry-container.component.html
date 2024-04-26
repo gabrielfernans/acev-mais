@@ -1,0 +1,16 @@
+<ng-container *ngIf="isLoading; else done">
+  <app-custom-loader></app-custom-loader>
+</ng-container>
+<ng-template #done>
+  <app-ministry-page
+    [ministry]="ministry"
+    [isManageable]="isManageable"
+    [foundMembers]="foundMembers"
+    [isModalOpen]="isModalOpen"
+    [isLoadingMember]="isLoadingMember"
+    (memberAdd)="addMemberRole($event)"
+    (memberRoleChange)="handleMemberRole($event)"
+    (memberSearch)="onMemberSearch($event)"
+    (modalChange)="isModalOpen = !isModalOpen"
+  ></app-ministry-page>
+</ng-template>

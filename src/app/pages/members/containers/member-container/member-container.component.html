@@ -1,0 +1,11 @@
+<ng-container *ngIf="isLoading; else done">
+  <app-custom-loader></app-custom-loader>
+</ng-container>
+<ng-template #done>
+  <app-member-page
+    [member]="member"
+    [isManageable]="isManageable"
+    [coordinates]="coordinates"
+    [isLoadingAddress]="isLoadingAddress"
+  ></app-member-page>
+</ng-template>

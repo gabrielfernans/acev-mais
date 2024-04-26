@@ -1,0 +1,65 @@
+<nz-layout class="app-layout">
+  <nz-sider
+    class="menu-sidebar"
+    nzCollapsible
+    nzWidth="256px"
+    nzBreakpoint="md"
+    [(nzCollapsed)]="isCollapsed"
+    [nzTrigger]="null"
+    nzTheme="dark"
+  >
+    <div class="sidebar-logo">
+      <a routerLink="/dashboard">
+        <img src="/assets/img/logo_blank.png" alt="logo" />
+      </a>
+    </div>
+    <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
+      <ng-container *ngFor="let menu of menus">
+        <li nz-menu-item nzMatchRouter [routerLink]="menu.route">
+          <span nz-icon [nzType]="menu.icon"></span>
+          <span>{{ menu.title }}</span>
+        </li>
+      </ng-container>
+    </ul>
+
+    <div class="sidebar-user" [ngClass]="{ collapsed: isCollapsed }">
+      <div class="sidebar-user-greeting" *ngIf="!isCollapsed">
+        {{ userGreeting }}
+      </div>
+      <div class="sidebar-user-logout" (click)="logout()">
+        <span nz-icon nzType="logout" nzTheme="outline"></span>
+        <p *ngIf="!isCollapsed">Sair</p>
+      </div>
+    </div>
+  </nz-sider>
+  <nz-layout class="content-layout">
+    <nz-header>
+      <div class="app-header">
+        <span class="header-trigger" (click)="isCollapsed = !isCollapsed">
+          <span class="trigger" nz-icon [nzType]="isCollapsed ? 'right' : 'left'"></span>
+        </span>
+        <div class="page-title">
+          <div class="page-title-breadcrumb">
+            <nz-breadcrumb [nzAutoGenerate]="false">
+              <nz-breadcrumb-item>
+                <a [routerLink]="['/dashboard']" nz-icon nzType="home"></a>
+              </nz-breadcrumb-item>
+              <nz-breadcrumb-item *ngFor="let crumb of breadcrumbs">
+                <a [routerLink]="[crumb.route]">{{ crumb.title }}</a>
+              </nz-breadcrumb-item>
+            </nz-breadcrumb>
+          </div>
+          <h1>{{ pageTitle }}</h1>
+        </div>
+        <div class="profile-menu"></div>
+      </div>
+    </nz-header>
+    <nz-content>
+      <div class="content-wrapper">
+        <div class="inner-content">
+          <router-outlet></router-outlet>
+        </div>
+      </div>
+    </nz-content>
+  </nz-layout>
+</nz-layout>

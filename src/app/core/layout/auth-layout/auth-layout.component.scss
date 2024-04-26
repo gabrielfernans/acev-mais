@@ -1,0 +1,26 @@
+.auth-layout-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100vw;
+  height: 100vh;
+
+  background-color: var(--custom-background-secondary-color);
+
+  &-img {
+    height: 1.25rem;
+  }
+
+  &-card {
+    box-shadow: var(--custom-shadows-sm);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    min-height: 30vh;
+    max-height: 90vh;
+    width: 480px;
+    max-width: 90%;
+    background-color: var(--custom-primary-white);
+  }
+}

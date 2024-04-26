@@ -1,0 +1,128 @@
+<div class="serie-container">
+  <div class="serie-container-side">
+    <div class="serie-container-side-profile">
+      <ng-container *ngIf="serie?.photoUrl; else lessonsGenericPhoto">
+        <div class="serie-container-side-profile-photo">
+          <div
+            class="serie-container-side-profile-photo-content"
+            [ngStyle]="{ background: 'url(' + serie.photoUrl + ')' }"
+          ></div>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="serie-container-side-data-leadership">
+      <label for="name">Autor</label>
+      <ng-container *ngIf="!serie.author; else author">
+        <p>Não há autor cadastrado</p>
+      </ng-container>
+      <ng-template #author>
+        <p>{{ serie.author }}</p>
+      </ng-template>
+    </div>
+
+    <div class="serie-container-side-actions" *ngIf="isManageable">
+      <button nz-button nzSize="large" nzType="primary" (click)="manageSerie()">
+        <span nz-icon nzType="setting" nzTheme="outline"></span>
+        Gerenciar série
+      </button>
+    </div>
+  </div>
+  <div class="serie-container-content">
+    <div class="serie-container-content-cards">
+      <ng-container *ngFor="let card of serieCards">
+        <app-custom-stats-card
+          [title]="card.title"
+          [value]="card.value"
+          [icon]="card.icon"
+          [color]="card.color"
+          [backgroundColor]="card.backgroundColor"
+        ></app-custom-stats-card>
+      </ng-container>
+    </div>
+
+    <ul nz-menu nzMode="horizontal">
+      <ng-container *ngFor="let menu of menus">
+        <li
+          nz-menu-item
+          [nzSelected]="activeMenu === menu.value"
+          (click)="onChangeMenu(menu.value)"
+        >
+          <span nz-icon [nzType]="menu.icon"></span>
+          {{ menu.title }}
+        </li>
+      </ng-container>
+    </ul>
+
+    <div class="serie-container-content-dynamic">
+      <ng-container *ngIf="activeMenu === 'lessons'">
+        <div class="actions-container" *ngIf="isManageable">
+          <button nz-button nzType="primary" (click)="addLesson()">
+            <span nz-icon nzType="user-add" nzTheme="outline"></span>
+            Adicionar estudo
+          </button>
+        </div>
+
+        <nz-table
+          class="serie-container-content-dynamic-table"
+          #basicTable
+          nzSize="small"
+          [nzData]="serie.lessons"
+          [nzShowPagination]="false"
+          [nzNoResult]="noData"
+        >
+          <thead>
+            <tr>
+              <ng-container *ngFor="let column of tableColumns">
+                <th [nzColumnKey]="column.key" [nzAlign]="column.align ? column.align : 'left'">
+                  {{ column.name }}
+                </th>
+              </ng-container>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let lesson of serie.lessons">
+              <td>
+                <a [href]="lesson.pdfUrl" target="_blank">
+                  {{ lesson.title || '-' }}
+                </a>
+              </td>
+              <td nzAlign="center">
+                <span>{{ lesson.revision || '-' }}</span>
+              </td>
+              <td nzAlign="center" *ngIf="isManageable">
+                <button nz-button nzType="default" nz-dropdown [nzDropdownMenu]="menu">
+                  <span nz-icon nzType="ellipsis"></span>
+                </button>
+                <nz-dropdown-menu #menu="nzDropdownMenu">
+                  <ul nz-menu nzSelectable>
+                    <li nz-menu-item (click)="viewLesson(lesson)">
+                      <span nz-icon nzType="eye" nzTheme="outline"></span>
+                      Visualizar estudo
+                    </li>
+                    <li nz-menu-item nzDanger (click)="deleteLesson(lesson)">
+                      <span nz-icon nzType="delete" nzTheme="outline"></span>
+                      Excluir estudo
+                    </li>
+                  </ul>
+                </nz-dropdown-menu>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<ng-template #lessonsGenericPhoto>
+  <div class="serie-container-side-profile-photo">
+    <div class="serie-container-side-profile-photo-content generic"></div>
+  </div>
+</ng-template>
+
+<ng-template #noData>
+  <div class="serie-container-empty">
+    <nz-empty [nzNotFoundContent]="'Não há estudos cadastradas para esta série.'"></nz-empty>
+  </div>
+</ng-template>

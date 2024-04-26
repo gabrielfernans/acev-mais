@@ -1,0 +1,276 @@
+<div class="agrupe-container">
+  <div class="agrupe-container-side">
+    <div class="agrupe-container-side-profile">
+      <ng-container *ngIf="agrupe?.photoUrl; else userGenericPhoto">
+        <div class="agrupe-container-side-profile-photo">
+          <div
+            class="agrupe-container-side-profile-photo-content"
+            [ngStyle]="{ background: 'url(' + agrupe.photoUrl + ')' }"
+          ></div>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="agrupe-container-side-data-tags">
+      <div class="agrupe-container-side-data-tags-item">
+        <app-custom-tag
+          [color]="agrupeCards[0].color"
+          [backgroundColor]="agrupeCards[0].backgroundColor"
+          [value]="agrupeView.category"
+        ></app-custom-tag>
+      </div>
+      <div class="agrupe-container-side-data-tags-item">
+        <app-custom-tag
+          [color]="agrupeCards[1].color"
+          [backgroundColor]="agrupeCards[1].backgroundColor"
+          [value]="agrupeView.dayOfMeeting"
+        ></app-custom-tag>
+      </div>
+    </div>
+
+    <div class="agrupe-container-side-data-leadership">
+      <label for="name">Liderança</label>
+      <ng-container *ngIf="leadership.length === 0; else leaders">
+        <p>Não há líderança cadastrada</p>
+      </ng-container>
+      <ng-template #leaders>
+        <nz-avatar-group class="agrupe-container-side-data-leadership-avatars">
+          <ng-container *ngFor="let leader of leadership; let i = index">
+            <ng-container *ngIf="leader.photoUrl; else noPic">
+              <nz-avatar
+                [nzSize]="48"
+                [nzSrc]="leader.photoUrl"
+                style="background-color: var(--custom-background-secondary-color)"
+              ></nz-avatar>
+            </ng-container>
+            <ng-template #noPic>
+              <nz-avatar
+                [nzSize]="48"
+                [ngStyle]="{
+                  backgroundColor: agrupeCards[0].backgroundColor,
+                  color: agrupeCards[0].color
+                }"
+                [nzText]="leader.initials"
+              ></nz-avatar>
+            </ng-template>
+          </ng-container>
+        </nz-avatar-group>
+      </ng-template>
+
+      <ng-container *ngFor="let leader of leadership; let i = index">
+        <p>{{ leader.name }} ({{ leader.isAgrupeLeader ? 'Líder' : 'Aprendiz' }})</p>
+      </ng-container>
+    </div>
+
+    <div class="agrupe-container-side-actions" *ngIf="isManageable">
+      <button nz-button nzSize="large" nzType="primary" (click)="manageAgrupe()">
+        <span nz-icon nzType="setting" nzTheme="outline"></span>
+        Gerenciar agrupe
+      </button>
+    </div>
+  </div>
+  <div class="agrupe-container-content">
+    <div class="agrupe-container-content-cards">
+      <ng-container *ngFor="let card of agrupeCards">
+        <app-custom-stats-card
+          [title]="card.title"
+          [value]="card.value"
+          [icon]="card.icon"
+          [color]="card.color"
+          [backgroundColor]="card.backgroundColor"
+        ></app-custom-stats-card>
+      </ng-container>
+    </div>
+
+    <ul nz-menu nzMode="horizontal">
+      <ng-container *ngFor="let menu of menus">
+        <li
+          nz-menu-item
+          [nzSelected]="activeMenu === menu.value"
+          (click)="onChangeMenu(menu.value)"
+        >
+          <span nz-icon [nzType]="menu.icon"></span>
+          {{ menu.title }}
+        </li>
+      </ng-container>
+    </ul>
+
+    <div class="agrupe-container-content-dynamic">
+      <ng-container *ngIf="activeMenu === 'members'">
+        <div class="actions-container" *ngIf="isManageable">
+          <button nz-button nzType="primary" (click)="changeModal()">
+            <span nz-icon nzType="user-add" nzTheme="outline"></span>
+            Adicionar membro
+          </button>
+        </div>
+
+        <nz-table
+          class="agrupe-container-content-dynamic-table"
+          #basicTable
+          nzSize="small"
+          [nzData]="agrupe.frequenters"
+          [nzShowPagination]="false"
+          [nzNoResult]="noData"
+        >
+          <thead>
+            <tr>
+              <ng-container *ngFor="let column of tableColumns">
+                <th [nzColumnKey]="column.key" [nzAlign]="column.align ? column.align : 'left'">
+                  {{ column.name }}
+                </th>
+              </ng-container>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let member of agrupe.frequenters">
+              <td>
+                <ng-container *ngIf="member.photoUrl; else noPic">
+                  <nz-avatar
+                    [nzSize]="28"
+                    [nzSrc]="member.photoUrl"
+                    style="background-color: var(--custom-background-secondary-color)"
+                  ></nz-avatar>
+                </ng-container>
+                <ng-template #noPic>
+                  <nz-avatar
+                    [nzSize]="28"
+                    [ngStyle]="{
+                      color: agrupeCards[0].color,
+                      backgroundColor: agrupeCards[0].backgroundColor
+                    }"
+                    [nzIcon]="'user'"
+                  ></nz-avatar>
+                </ng-template>
+
+                <a [routerLink]="['/members', member.id]">{{ member.name }}</a>
+              </td>
+              <td nzAlign="center">
+                <app-custom-tag
+                  [backgroundColor]="'var(--custom-primary-teal)'"
+                  [value]="
+                    member.isAgrupeLeader
+                      ? 'Líder'
+                      : member.isAgrupeApprentice
+                        ? 'Aprendiz'
+                        : 'Membro'
+                  "
+                ></app-custom-tag>
+              </td>
+              <td nzAlign="center" *ngIf="isManageable">
+                <button nz-button nzType="default" nz-dropdown [nzDropdownMenu]="menu">
+                  <span nz-icon nzType="ellipsis"></span>
+                </button>
+                <nz-dropdown-menu #menu="nzDropdownMenu">
+                  <ul nz-menu nzSelectable>
+                    <li nz-menu-item [routerLink]="['/members', member.id]">
+                      <span nz-icon nzType="eye" nzTheme="outline"></span>
+                      Ver perfil
+                    </li>
+                    <ng-container *ngIf="!member.isAgrupeLeader">
+                      <li nz-menu-item (click)="addMemberRole(member, leaderRole)">
+                        <span nz-icon nzType="user-switch" nzTheme="outline"></span>
+                        Tornar líder
+                      </li>
+                    </ng-container>
+                    <ng-container *ngIf="!member.isAgrupeApprentice">
+                      <li nz-menu-item (click)="addMemberRole(member, apprenticeRole)">
+                        <span nz-icon nzType="user-switch" nzTheme="outline"></span>
+                        Tornar aprendiz
+                      </li>
+                    </ng-container>
+                    <ng-container *ngIf="member.isAgrupeLeader">
+                      <li nz-menu-item (click)="removeMemberRole(member, leaderRole)">
+                        <span nz-icon nzType="disconnect" nzTheme="outline"></span>
+                        Remover liderança
+                      </li>
+                    </ng-container>
+                    <ng-container *ngIf="member.isAgrupeApprentice">
+                      <li nz-menu-item (click)="removeMemberRole(member, apprenticeRole)">
+                        <span nz-icon nzType="disconnect" nzTheme="outline"></span>
+                        Remover aprendizado
+                      </li>
+                    </ng-container>
+                    <li nz-menu-item (click)="removeMember(member)" nzDanger>
+                      <span nz-icon nzType="disconnect" nzTheme="outline"></span>
+                      Desvincular membro
+                    </li>
+                  </ul>
+                </nz-dropdown-menu>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </ng-container>
+      <ng-container *ngIf="activeMenu === 'address'">
+        <div class="agrupe-container-content-dynamic-address">
+          <ng-container *ngIf="agrupe?.address; else noAddress">
+            <p [innerHTML]="addressView"></p>
+          </ng-container>
+          <ng-container *ngIf="!isLoadingAddress && coordinates.results.length > 0">
+            <app-custom-location [coordinates]="coordinates"></app-custom-location>
+          </ng-container>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="activeMenu === 'meetings'">
+        <h3>Reuniões</h3>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<nz-modal
+  nzTitle="Adicionar membro"
+  nzOkText="Adicionar"
+  [(nzVisible)]="isModalOpen"
+  [nzOkLoading]="isLoadingMember"
+  (nzOnCancel)="changeModal()"
+  (nzOnOk)="addMember()"
+>
+  <ng-container *nzModalContent>
+    <nz-select
+      nzAllowClear
+      nzShowSearch
+      nzServerSearch
+      nzPlaceHolder="Digite o nome do membro"
+      [(ngModel)]="selectedUser"
+      (nzOnSearch)="onSearchMembers($event)"
+    >
+      <ng-container *ngFor="let member of foundMembers">
+        <nz-option
+          *ngIf="!isLoadingMember"
+          [nzValue]="member.id"
+          [nzLabel]="member.name"
+          [nzDisabled]="isMemberAlreadyAdded(member.id)"
+        >
+          ></nz-option
+        >
+      </ng-container>
+      <nz-option *ngIf="isLoadingMember" nzDisabled nzCustomContent>
+        <span nz-icon nzType="loading" class="loading-icon"></span>
+        Procurando...
+      </nz-option>
+    </nz-select>
+    <label>
+      Selecione o membro que deseja adicionar. Se o membro estiver cadastrado em outro agrupe, ele
+      será desvinculado.
+    </label>
+  </ng-container>
+</nz-modal>
+
+<ng-template #userGenericPhoto>
+  <div class="agrupe-container-side-profile-photo">
+    <div class="agrupe-container-side-profile-photo-content generic"></div>
+  </div>
+</ng-template>
+
+<ng-template #noAddress>
+  <div class="agrupe-container-empty">
+    <nz-empty [nzNotFoundContent]="'Este agrupe não possui um endereço cadastrado.'"></nz-empty>
+  </div>
+</ng-template>
+
+<ng-template #noData>
+  <div class="agrupe-container-empty">
+    <nz-empty [nzNotFoundContent]="'Não há membros cadastrados neste agrupe.'"></nz-empty>
+  </div>
+</ng-template>

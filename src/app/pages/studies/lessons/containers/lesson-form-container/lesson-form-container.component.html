@@ -1,0 +1,17 @@
+<app-custom-loader *ngIf="isLoading"></app-custom-loader>
+<div class="lesson-form-container" *ngIf="!isLoading">
+  <div class="lesson-form-container-section illustration">
+    <img src="/assets/img/add.jpg" alt="Add wallpaper" />
+  </div>
+  <div class="lesson-form-container-section">
+    <app-lesson-form-page
+      [lesson]="lesson"
+      [idSerie]="idSerie"
+      [isManageable]="isManageable"
+      [isManagement]="isManagement"
+      [isSubmitting]="isSubmitting"
+      (submit)="submit($event)"
+      (deleteLesson)="openDeleteConfirm()"
+    ></app-lesson-form-page>
+  </div>
+</div>

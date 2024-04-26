@@ -1,0 +1,12 @@
+.custom-tag-wrapper {
+  display: block;
+  margin: 0 auto;
+  background-color: var(--custom-primary-teal);
+  border-radius: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  font-size: 10px;
+  color: var(--custom-primary-white);
+  text-transform: uppercase;
+  font-weight: 500;
+  width: max-content;
+}

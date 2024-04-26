@@ -1,0 +1,22 @@
+<ng-container *ngIf="!isLoading; else loader">
+  <div class="actions-container" *ngIf="isManageable">
+    <button nz-button nzType="primary" [routerLink]="['/agrupes', 'add']">Adicionar</button>
+  </div>
+  <ng-container *ngIf="!serverError && agrupes.length !== 0; else feedback">
+    <app-agrupes-page [agrupes]="agrupes"></app-agrupes-page>
+  </ng-container>
+</ng-container>
+
+<ng-template #feedback>
+  <ng-container *ngIf="serverFeedback">
+    <app-custom-feedback
+      [type]="serverFeedback.status"
+      [title]="serverFeedback.title"
+      [subTitle]="serverFeedback.subtitle"
+    ></app-custom-feedback>
+  </ng-container>
+</ng-template>
+
+<ng-template #loader>
+  <app-custom-loader></app-custom-loader>
+</ng-template>

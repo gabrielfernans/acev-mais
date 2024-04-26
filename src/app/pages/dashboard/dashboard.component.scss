@@ -1,0 +1,24 @@
+.dashboard-container {
+  display: grid;
+  gap: 1.5rem;
+  height: 100%;
+
+  &-top {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  &-charts {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    overflow: hidden;
+  }
+
+  &.hidden {
+    position: absolute;
+    visibility: hidden;
+    top: -10000px;
+  }
+}

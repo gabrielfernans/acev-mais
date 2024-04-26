@@ -1,0 +1,268 @@
+<div class="agrupe-meeting-container-form">
+  <nz-steps [nzCurrent]="current" nzSize="small">
+    <nz-step nzTitle="Dados"> </nz-step>
+    <nz-step nzTitle="Participantes"> </nz-step>
+    <nz-step nzTitle="Convidados"> </nz-step>
+    <nz-step nzTitle="Foto"> </nz-step>
+  </nz-steps>
+
+  <!-- DADOS: CURRENT = 0 -->
+  <ng-container *ngIf="current === 0">
+    <span class="agrupe-meeting-container-form-guide">Insira aqui as informações básicas</span>
+    <form [formGroup]="formInfo" class="agrupe-meeting-container-form-wrapper">
+      <div class="agrupe-meeting-container-form-item">
+        <label for="agrupe">Agrupe</label>
+
+        <nz-select
+          formControlName="idAgrupe"
+          nzPlaceHolder="ex: Agrupe do Cruzeiro"
+          nzSize="large"
+          [nzStatus]="idAgrupe.invalid && idAgrupe.touched ? 'error' : ''"
+        >
+          <ng-container *ngFor="let item of agrupes">
+            <nz-option [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+          </ng-container>
+        </nz-select>
+      </div>
+
+      <div class="agrupe-meeting-container-form-item">
+        <label for="date">Data do encontro</label>
+        <input
+          nz-input
+          nzSize="large"
+          formControlName="date"
+          placeholder="ex: 05/05/2024"
+          mask="00/00/0000"
+          [nzStatus]="date.invalid && date.touched ? 'error' : ''"
+        />
+      </div>
+
+      <div class="agrupe-meeting-container-form-item">
+        <label>Foi utilizado estudo extra</label>
+
+        <nz-switch formControlName="customLesson"></nz-switch>
+      </div>
+
+      <ng-container *ngIf="customLesson.value === false; else customLessonTemplate">
+        <div class="agrupe-meeting-container-form-item">
+          <label for="series">Série de estudos</label>
+
+          <nz-select
+            formControlName="selectedSeries"
+            nzPlaceHolder="ex: O evangelho de Jesus Cristo"
+            nzSize="large"
+          >
+            <ng-container *ngFor="let item of series">
+              <nz-option [nzValue]="item" [nzLabel]="item.title"></nz-option>
+            </ng-container>
+          </nz-select>
+        </div>
+
+        <div class="agrupe-meeting-container-form-item" *ngIf="selectedSeries.value">
+          <label for="series">Estudo apresentado</label>
+
+          <nz-select
+            formControlName="idLesson"
+            nzPlaceHolder="ex: Estudo 1 - O caráter da humanidade"
+            nzSize="large"
+          >
+            <ng-container *ngFor="let item of selectedSeries.value.lessons">
+              <nz-option [nzValue]="item.id" [nzLabel]="item.title"></nz-option>
+            </ng-container>
+          </nz-select>
+        </div>
+      </ng-container>
+
+      <ng-template #customLessonTemplate>
+        <div class="agrupe-meeting-container-form-item">
+          <label for="title">Título do estudo extra</label>
+          <input
+            formControlName="customLessonTitle"
+            nz-input
+            placeholder="ex: Filme e lição sobre a vida de Paulo"
+            nzSize="large"
+            [nzStatus]="!customLessonTitle.value && customLessonTitle.touched ? 'error' : ''"
+          />
+        </div>
+      </ng-template>
+    </form>
+  </ng-container>
+
+  <!-- PARTICIPANTES: CURRENT = 1 -->
+
+  <ng-container *ngIf="current === 1">
+    <span class="agrupe-meeting-container-form-guide">Agora, adicione os participantes</span>
+
+    <div class="agrupe-meeting-container-form-wrapper">
+      <div class="agrupe-meeting-container-form-item">
+        <label for="participants">Membros</label>
+
+        <nz-select
+          nzMode="multiple"
+          nzShowSearch
+          nzServerSearch
+          nzAllowClear
+          nzPlaceHolder="Digite o nome do membro"
+          [(ngModel)]="participants"
+          [nzMaxTagCount]="3"
+          (nzOnSearch)="onSearchMembers($event)"
+        >
+          <ng-container *ngFor="let member of foundMembers">
+            <nz-option
+              *ngIf="!isLoadingMember && !isMemberAlreadyAdded(member.id)"
+              [nzValue]="member"
+              [nzLabel]="member.name"
+            >
+              ></nz-option
+            >
+          </ng-container>
+          <nz-option *ngIf="isLoadingMember" nzDisabled nzCustomContent>
+            <span nz-icon nzType="loading" class="loading-icon"></span>
+            Procurando...
+          </nz-option>
+        </nz-select>
+      </div>
+
+      <!-- Lista de membros adicionados -->
+      <div class="agrupe-meeting-container-form-members">
+        <ng-container *ngFor="let member of participants">
+          <div class="agrupe-meeting-container-form-members-item">
+            <span>{{ member.name }}</span>
+            <button
+              nz-button
+              nzType="text"
+              nzSize="small"
+              [nzDanger]="true"
+              (click)="removeMember(member)"
+            >
+              <span nz-icon nzType="delete" nzTheme="outline"></span>
+            </button>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- CONVIDADOS: CURRENT = 2 -->
+
+  <ng-container *ngIf="current === 2">
+    <span class="agrupe-meeting-container-form-guide"
+      >Recebeu algum convidado? Adicione-o aqui</span
+    >
+
+    <div class="agrupe-meeting-container-form-item" style="padding-top: 1rem">
+      <label for="guests">Convidados</label>
+      <input
+        [(ngModel)]="guestName"
+        nz-input
+        placeholder="Digite o nome do convidado"
+        nzSize="large"
+        (keydown.enter)="addGuest()"
+      />
+      <button
+        nz-button
+        nzType="primary"
+        nzSize="large"
+        (click)="addGuest()"
+        [disabled]="guestName === ''"
+      >
+        Adicionar
+      </button>
+    </div>
+
+    <div class="agrupe-meeting-container-form-guests">
+      <div
+        class="agrupe-meeting-container-form-guests-item"
+        *ngFor="let guest of guests; let i = index"
+      >
+        <span>{{ guest }}</span>
+        <button nz-button nzType="text" nzSize="small" [nzDanger]="true" (click)="removeGuest(i)">
+          <span nz-icon nzType="delete" nzTheme="outline"></span>
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- IMAGEM: CURRENT = 3 -->
+  <ng-container *ngIf="current === 3">
+    <span class="agrupe-meeting-container-form-guide"
+      >Gostaria de {{ isManagement ? 'atualizar' : 'adicionar' }} a foto deste encontro?</span
+    >
+    <div class="agrupe-meeting-container-form-wrapper">
+      <div class="agrupe-meeting-container-form-item upload">
+        <!-- Componente de upload de arquivo -->
+        <ngx-file-drop [ngStyle]="{ width: '100%' }" (onFileDrop)="onDrop($event)">
+          <ng-template ngx-file-drop-content-tmp let-openFileSelector="openFileSelector">
+            <span class="file-uploader-icon" nz-icon nzType="file-image" nzTheme="outline"></span>
+
+            <p class="file-uploader-description">
+              Arraste e solte uma imagem aqui ou clique para selecionar.
+            </p>
+
+            <button
+              class="file-uploader-button"
+              nz-button
+              nzSize="large"
+              nzType="primary"
+              type="button"
+              (click)="openFileSelector()"
+            >
+              Escolher Arquivo
+            </button>
+          </ng-template>
+        </ngx-file-drop>
+
+        <!-- Preview da imagem -->
+        <div *ngIf="avatarUrl" class="file-uploader-preview">
+          <img [src]="avatarUrl" alt="Preview da Imagem" />
+          <div class="file-uploader-preview-data">
+            <span
+              ><span nz-icon nzType="paper-clip" nzTheme="outline"></span>
+              {{ selectedImage?.name || '' }}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="agrupe-meeting-container-form-footer">
+    <button
+      *ngIf="isManagement"
+      nz-button
+      nzType="default"
+      nzSize="large"
+      [nzDanger]="true"
+      [ngStyle]="{ marginRight: 'auto' }"
+      (click)="onDelete()"
+    >
+      <span nz-icon nzType="delete" nzTheme="outline"></span>
+      Excluir
+    </button>
+    <button nz-button nzType="default" nzSize="large" (click)="pre()" *ngIf="current > 0">
+      <span>Voltar</span>
+    </button>
+    <button
+      *ngIf="current < 3"
+      nz-button
+      nzType="primary"
+      nzSize="large"
+      [disabled]="isDisabled()"
+      (click)="next()"
+    >
+      <span>Próximo</span>
+    </button>
+    <button
+      nz-button
+      nzType="primary"
+      nzSize="large"
+      [nzLoading]="isSubmitting"
+      (click)="onSubmit()"
+      *ngIf="current === 3"
+    >
+      <span>{{
+        isManagement ? 'Atualizar' : selectedImage ? 'Cadastrar' : 'Cadastrar sem imagem'
+      }}</span>
+    </button>
+  </div>
+</div>

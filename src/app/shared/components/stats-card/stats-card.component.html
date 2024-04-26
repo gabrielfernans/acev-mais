@@ -1,0 +1,15 @@
+<nz-card [nzLoading]="isLoading">
+  <div class="stats-card-container">
+    <span
+      class="stats-card-container-icon"
+      nz-icon
+      nzTheme="outline"
+      [nzType]="icon"
+      [ngStyle]="{ backgroundColor: backgroundColor, color: color }"
+    ></span>
+    <div class="stats-card-container-data">
+      <h1>{{ value }}</h1>
+      <p>{{ title }}</p>
+    </div>
+  </div>
+</nz-card>
